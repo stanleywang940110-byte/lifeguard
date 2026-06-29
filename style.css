@@ -1,0 +1,2324 @@
+/* �箇��滨蔭�����見撘� */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', Arial, '敺株�甇��擃�', sans-serif;
+}
+
+body,
+html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* �脫迫�游�讠雯��枂�暹遝�閙�嚗峕芋�� App 擃娪� */
+    background-color: #1a1a1a;
+    color: #f5f5f5;
+}
+
+/* 銝餃捆�� */
+#app-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* �恍𢒰 (Screen) �箇�璅������渲身摰� */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(50px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow-y: auto;
+    /* ��迂�桐��恍𢒰�折�皛曉� (靘见�閬硋榆皛曉���) */
+    background-color: #242424;
+}
+
+/* 作用中的畫面 */
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    z-index: 10;
+}
+
+/* 捲動式影片頁面：使用 fixed 確保 bounding rect 與視窗完全對齊，讓 embed 的 sticky 影片面板定位正確 */
+#beach-screen,
+#rip-current-video-screen,
+#scrollable-video-screen,
+#rescue-board-video-screen,
+#rescue-boat-video-screen,
+#river-dual-channel-screen {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #0a0a0a;
+    text-align: left;
+}
+
+#beach-screen > div,
+#rip-current-video-screen > div,
+#scrollable-video-screen > div,
+#rescue-board-video-screen > div,
+#rescue-boat-video-screen > div,
+#river-dual-channel-screen > div {
+    width: 100%;
+}
+
+/* �批捆��憛� */
+.content {
+    max-width: 800px;
+    width: 90%;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+h1,
+h2 {
+    margin-bottom: 20px;
+    color: #4da6ff;
+    letter-spacing: 1px;
+}
+
+p {
+    margin-bottom: 30px;
+    line-height: 1.6;
+    font-size: 1.1rem;
+    color: #cccccc;
+}
+
+/* �厰�璅�� */
+button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 30px;
+    background-color: #4da6ff;
+    color: #ffffff;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(77, 166, 255, 0.3);
+}
+
+button:hover {
+    background-color: #338ce6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(77, 166, 255, 0.4);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button.secondary {
+    background-color: transparent;
+    border: 2px solid #666;
+    color: #ddd;
+    box-shadow: none;
+}
+
+button.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #888;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* �詨鱓蝬脫聢 */
+.menu-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.2rem;
+    background-color: #2a3b4c;
+}
+
+.menu-btn:hover {
+    background-color: #3b536b;
+}
+
+/* 雿𥪯���憛� (憒��銵具���撌�) */
+.chart-placeholder,
+.parallax-placeholder {
+    width: 100%;
+    height: 200px;
+    background: repeating-linear-gradient(45deg,
+            #333,
+            #333 10px,
+            #444 10px,
+            #444 20px);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+    color: #999;
+    font-style: italic;
+}
+
+.parallax-placeholder {
+    height: 400px;
+    /* 閬硋榆皛曉��鞟��游之蝛粹� */
+}
+
+/* === GAME LAYER CSS === */
+.game-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: transparent;
+    overflow: hidden;
+    cursor: crosshair;
+    z-index: 10;
+    transition: opacity 1.5s ease, visibility 1.5s;
+}
+
+.game-layer.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+@keyframes cameraShake {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    20% {
+        transform: translate(-8px, 5px);
+    }
+
+    40% {
+        transform: translate(6px, -6px);
+    }
+
+    60% {
+        transform: translate(-5px, 4px);
+    }
+
+    80% {
+        transform: translate(5px, -3px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+/* ============================
+   Game -> News 頧匧聦?�? (樴𨅯控撜園??滩𠧧蝟餉?撖怠祕瘚芾�)
+============================ */
+.wave-transition {
+    position: fixed;
+    top: 100vh;
+    left: 0;
+    width: 100vw;
+    height: 220vh;
+    /* ?祉?瘚瑟?瘛梯??脰矽嚗𡁜葆?匧?敶梯??𣇉?瘛望滓撅斗活瞍詨惜 */
+    background: linear-gradient(165deg, #44778d 0%, #355461 40%, #223740 100%);
+    z-index: 10000;
+    pointer-events: none;
+    visibility: hidden;
+    transition: transform 2.0s cubic-bezier(0.19, 1, 0.22, 1), opacity 1.2s ease;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    opacity: 1;
+}
+
+/* ??儭??��瘚芣蔭嚗𡁜?銝羓?撘批漲 (?脣聦?�?瘚芸?嚗�葆?㗇部瘝怠荗?扳?) */
+.wave-transition::before {
+    content: '';
+    position: absolute;
+    top: -15vw;
+    left: 0;
+    width: 100vw;
+    height: 15.5vw;
+    /* 憭𡁻? SVG ?峕艶嚗𡁜?撅斗楛?脫答 + ?�惜?質𠧧瘜⊥疵蝣擧答 */
+    background:
+        url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23f0f9ff" fill-opacity="0.6" d="M0,192L48,197.3C96,203,192,213,288,192C384,171,480,117,576,112C672,107,768,149,864,165.3C960,181,1056,171,1152,154.7C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>'),
+        url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%2344778d" d="M0,160L48,144C96,128,192,96,288,106.7C384,117,480,171,576,186.7C672,203,672,181,864,165.3C960,149,1056,139,1152,144C1248,149,1344,171,1392,181.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+    background-size: cover;
+    z-index: 2;
+    /* 憓𧼮?銝�暺鮋?瘞湧𧊅?�???*/
+    filter: drop-shadow(0 -5px 15px rgba(255, 255, 255, 0.2));
+}
+
+/* ?? 摨閖�瘚芣蔭嚗𡁜篅?瑞?撘批漲 (?Ｗ聦?�?瘚芸偏嚗峕楛?滩𠧧?𨀣𦻖) */
+.wave-transition::after {
+    content: '';
+    position: absolute;
+    bottom: -12vw;
+    left: 0;
+    width: 100vw;
+    height: 12.5vw;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%23223740" d="M0,192L60,213.3C120,224,240,245,360,234.7C480,224,600,181,720,170.7C840,160,960,181,1080,192C1200,203,1320,203,1380,203L1440,203L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path></svg>');
+    background-size: cover;
+    z-index: 2;
+}
+
+/* ?�?见??𨥈?銝�瘞?㴝?鞟??�� */
+.wave-transition.sweep-in {
+    visibility: visible;
+    transform: translate3d(0, -380vh, 0);
+}
+
+/* ?嗆??圈??冽?嚗𣬚策鈭�?蝯脩結?�楚?箸?嚗諹??ａ??Ｗ??�?雿𨀣凒?𥪜? */
+.wave-transition.sweep-out {
+    opacity: 0;
+}
+
+.game-layer.screen-shake {
+    animation: cameraShake 0.6s ease;
+}
+
+/* ?? 撖怠祕瘚瑟??峕艶 */
+.ocean-background {
+    position: absolute;
+    inset: -20px;
+    /* ?坔枂?羓??踹??硋??�忽撟?*/
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.85)),
+        url("https://images.unsplash.com/photo-1505118380757-91f5f5632de0");
+    /* 蝝𥪯膳閬硔���憭拍征?�絲瘚芰???*/
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+    pointer-events: none;
+    transition: background-position 3s ease-out, background-size 3s ease-out;
+    transform: rotate(90deg) scale(3);
+}
+
+.ocean-background.playing {
+    background-size: 150%;
+    /* ?滚? 90摨行?頧㚁??滢? left/right ?喃誨銵函𧞄?Ｖ??�??湔䲮?𤑳宏??*/
+    background-position: left center;
+}
+
+/* 瘞湧𢒰?匧蔣 */
+.ocean-background::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.15), transparent 40%),
+        radial-gradient(circle at 80% 60%, rgba(255, 255, 255, 0.1), transparent 50%);
+    animation: waterLight 6s infinite alternate;
+}
+
+@keyframes waterLight {
+    from {
+        opacity: 0.6;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* ============================
+   UI嚗�縧?�?嚗?============================ */
+.start-ui {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    transition: opacity 0.5s;
+}
+
+.ui-content {
+    padding: 50px 40px;
+    text-align: center;
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    color: white;
+    width: 90%;
+    max-width: 480px;
+}
+
+.start-ui.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.news-tag {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.start-title {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 600;
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+.start-desc {
+    font-size: 1.05rem;
+    color: #cbd5e1;
+    margin-bottom: 36px;
+    line-height: 1.8;
+    font-weight: 300;
+}
+
+.start-btn {
+    padding: 16px 45px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 999px;
+    background: #0ea5e9;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: 'Noto Sans TC', sans-serif;
+    box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+}
+
+.start-btn:hover {
+    transform: scale(1.05);
+    background: #38bdf8;
+}
+
+/* ?𦠜�銝?UI */
+.game-ui {
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    z-index: 5;
+    pointer-events: none;
+    transition: opacity 1s, transform 1s;
+    display: flex;
+    justify-content: center;
+}
+
+.game-ui .ui-content {
+    padding: 24px;
+    /* ?𦠜�?脰?銝凋??�閬�??剝�暻澆之??padding */
+}
+
+.game-ui.hide {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+}
+
+.game-title {
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    color: #ffffff;
+}
+
+.game-instruction {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    font-weight: 300;
+}
+
+.skip-btn {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: 0.3s;
+    font-family: inherit;
+    pointer-events: auto;
+    /* Ensure it is clickable despite game-ui pointer-events setting */
+}
+
+.skip-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* ?脣漲璇?*/
+.progress-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.progress-bar-wrap {
+    flex-grow: 1;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+    margin-right: 15px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+    transition: width 0.15s ease-out;
+}
+
+.progress-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    min-width: 80px;
+    text-align: right;
+}
+
+.progress-text span {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    font-weight: 500;
+}
+
+/* ?梢麬?鞟內 */
+.surge-warning {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    text-align: center;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+    background: rgba(255, 0, 0, 0.15);
+    animation: fadeInOut 1.5s infinite;
+}
+
+.surge-warning h2 {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.7;
+    }
+}
+
+.surge-warning.hide {
+    display: none;
+}
+
+/* ============================
+   Beach Layer (撖怠祕瘝嗵? ?其???
+============================ */
+.beach-layer {
+    position: absolute;
+    bottom: 0vh;
+    left: 0;
+    width: 100vw;
+    height: 35vh;
+    z-index: 3;
+    pointer-events: none;
+    transition: transform 3s cubic-bezier(0.5, 0, 0.2, 1), opacity 3s;
+    background:
+        linear-gradient(transparent, rgba(0, 0, 0, 0.85) 80%),
+        url("https://images.unsplash.com/photo-1473116763249-2faaef81ccda");
+    background-size: cover;
+    background-position: bottom;
+    mask-image: linear-gradient(to top, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to top, black 50%, transparent 100%);
+}
+
+.beach-layer.recede {
+    transform: translateY(40vh);
+    opacity: 0;
+}
+
+
+/* ============================
+   閫坿𠧧?滨蔭?�???============================ */
+.swimmer {
+    position: absolute;
+    bottom: -6vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.swimmer.intro-standby {
+    bottom: 5vh;
+    transform: translateX(-50%) scale(1.5);
+}
+
+.swimmer.jump-in {
+    animation: diveAnimation 2.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes diveAnimation {
+    0% {
+        bottom: 5vh;
+        transform: translateX(-50%) scale(1.5) rotate(0deg);
+    }
+
+    15% {
+        bottom: 5vh;
+        transform: translateX(-50%) scale(1.5) rotate(-5deg);
+    }
+
+    50% {
+        bottom: 40vh;
+        transform: translateX(-50%) scale(1.2) rotate(10deg);
+    }
+
+    85% {
+        bottom: -6vh;
+        transform: translateX(-50%) scale(1) rotate(-3deg);
+    }
+
+    100% {
+        bottom: -6vh;
+        transform: translateX(-50%) scale(1) rotate(0deg);
+    }
+}
+
+.lifeguard-silhouette {
+    width: 160px;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+    margin: 0 auto;
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0px);
+    }
+
+    50% {
+        transform: translate(0, -6px);
+    }
+
+    100% {
+        transform: translate(0, 0px);
+    }
+}
+
+/* ?閙??芰眏撘誩?瘞?(蝬�? playing ?�?页??蓥??游??笔祕皜豢陶) */
+.playing .swim-arm-left {
+    transform-origin: 75px 65px;
+    animation: realSwimCrawl 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.playing .swim-arm-right {
+    transform-origin: 125px 65px;
+    animation: realSwimCrawl 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    animation-delay: 0.9s;
+}
+
+@keyframes realSwimCrawl {
+    0% {
+        transform: rotate(15deg) scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+
+    20% {
+        transform: rotate(-80deg) scale(0.85);
+        opacity: 0.5;
+        filter: brightness(0.6);
+    }
+
+    /* 瘛勗�瘞港葉撘瑕𨋍?冽偌 */
+    50% {
+        transform: rotate(-70deg) scale(0.9);
+        opacity: 0.8;
+        filter: brightness(0.8);
+    }
+
+    /* ?见??鞱??箸偌 */
+    80% {
+        transform: rotate(45deg) scale(1.05);
+        opacity: 1;
+        filter: brightness(1.1);
+    }
+
+    /* ?脣枂瘞湧𢒰敺�?滚之?𥕢撓撅?*/
+    100% {
+        transform: rotate(15deg) scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+/* ?躰�蝡钅??𤘪偌?閧𧞄 (?誯? opacity & scale 璅⊥挱銝贝萱頦拇偌瘛勗漲) */
+.playing .swim-leg-left {
+    animation: flutterKickLeft 0.8s infinite ease-in-out;
+}
+
+.playing .swim-leg-right {
+    animation: flutterKickRight 0.8s infinite ease-in-out;
+}
+
+@keyframes flutterKickLeft {
+    0% {
+        transform: rotate(-5deg) scaleY(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: rotate(2deg) scaleY(0.85);
+        opacity: 0.5;
+        filter: brightness(0.7);
+    }
+
+    100% {
+        transform: rotate(-5deg) scaleY(1);
+        opacity: 1;
+    }
+}
+
+@keyframes flutterKickRight {
+    0% {
+        transform: rotate(5deg) scaleY(0.85);
+        opacity: 0.5;
+        filter: brightness(0.7);
+    }
+
+    50% {
+        transform: rotate(-2deg) scaleY(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: rotate(5deg) scaleY(0.85);
+        opacity: 0.5;
+        filter: brightness(0.7);
+    }
+}
+
+/* ?芰�?�偌?望郭蝝贝?頝?(璅⊥挱?躰�?𤘪偌?�??脩?瘜⊥疵) */
+.water-wake {
+    position: absolute;
+    width: 140px;
+    height: 150px;
+    background: radial-gradient(ellipse at center 20%, rgba(200, 240, 255, 0.4) 0%, transparent 60%);
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: -2;
+    filter: blur(6px);
+    animation: wakePulse 1.6s infinite alternate ease-in-out;
+}
+
+@keyframes wakePulse {
+    0% {
+        transform: translateX(-50%) scaleY(1) scaleX(0.85);
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateX(-50%) scaleY(1.4) scaleX(1.15);
+        opacity: 0.7;
+    }
+}
+
+.mega-splash {
+    position: absolute;
+    bottom: 10vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    background: #ffffff;
+    border-radius: 50%;
+    opacity: 0.8;
+    z-index: 5;
+    pointer-events: none;
+    animation: megaSplashAnim 1s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    filter: blur(6px);
+}
+
+@keyframes megaSplashAnim {
+    0% {
+        width: 50px;
+        height: 50px;
+        opacity: 0.8;
+        bottom: 5vh;
+    }
+
+    100% {
+        width: 500px;
+        height: 180px;
+        opacity: 0;
+        bottom: 20vh;
+    }
+}
+
+.swimmer.dash {
+    transform: translateX(-50%) translateY(-3vh);
+}
+
+.swimmer.dash .water-wake {
+    filter: blur(4px) brightness(1.5);
+    transition: filter 0.3s;
+}
+
+/* ============================
+   瘚格??�鸌??(撖怠祕?啗??�?敶Ｘ筑璅?
+============================ */
+.lifesaver {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+    z-index: 6;
+    transition: transform 0.2s;
+    animation: floatUpSurface 6s linear infinite;
+    pointer-events: auto;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.15));
+}
+
+@keyframes floatUpSurface {
+    0% {
+        top: 110vh;
+        rotate: -4deg;
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    85% {
+        opacity: 1;
+    }
+
+    100% {
+        top: -20vh;
+        rotate: 20deg;
+        opacity: 0;
+    }
+}
+
+.floating-text {
+    position: absolute;
+    color: #ef4444;
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'Noto Sans TC', sans-serif;
+    pointer-events: none;
+    z-index: 100;
+    animation: floatUpFade 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+}
+
+@keyframes floatUpFade {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(0.5);
+    }
+
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -40px) scale(1.1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -80px) scale(0.9);
+    }
+}
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    transform: translate(-50%, -50%);
+    animation: rippleExpand 0.6s ease-out forwards;
+    pointer-events: none;
+    z-index: 3;
+}
+
+@keyframes rippleExpand {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+
+    100% {
+        width: 120px;
+        height: 120px;
+        opacity: 0;
+    }
+}
+
+/* ============================
+   News Layer (Light Ocean Theme)
+/* === 視差滾動效果 PARALLAX SCROLLING === */
+/* === 視差滾動效果 PARALLAX SCROLLING (Scrollytelling 版) === */
+#parallax-screen,
+#beach-screen {
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: block !important;
+    position: relative;
+    padding: 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scrolly-bg-container {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+.scrolly-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    filter: brightness(0.4);
+    background-color: #000000; /* 黑底，確保 contain 產生的黑邊能完美融入背景 */
+}
+
+.scrolly-bg.active {
+    opacity: 1;
+}
+
+.scrolly-text-container {
+    position: relative;
+    z-index: 2;
+    margin-top: -100vh;
+    /* 讓第一個文字框疊加在第一個背景上 */
+}
+
+.scrolly-step {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+}
+
+/* 海邊專用：文字框置右 */
+#beach-screen .scrolly-step {
+    justify-content: flex-end;
+    padding-right: 12%;
+}
+
+@media (max-width: 768px) {
+    #beach-screen .scrolly-step {
+        justify-content: center;
+        padding-right: 40px;
+    }
+}
+
+.scrolly-spacer {
+    height: 30vh;
+    /* 預留底部空間 */
+}
+
+.bg-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 保持影片完整比例與內容，絕不裁切任何邊緣 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: filter 1.5s ease;
+}
+
+.scrolly-bg.active .bg-video {
+    /* 移除縮放效果以確保完整畫面呈現 */
+}
+
+.parallax-content {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+}
+
+.parallax-content.right-align {
+    justify-content: flex-end;
+}
+
+.parallax-content.center-align {
+    justify-content: center;
+    text-align: center;
+}
+
+.parallax-text-box {
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 40px;
+    border-radius: 16px;
+    max-width: 500px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    
+    /* 視差載入淡入與滑升效果 */
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scrolly-step.in-view .parallax-text-box,
+.parallax-content.in-view .parallax-text-box {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.empty-box {
+    width: 300px;
+    height: 250px;
+}
+
+.parallax-text-box h2 {
+    color: #38bdf8;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    line-height: 1.3;
+}
+
+.parallax-text-box p {
+    color: #f1f5f9;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin-bottom: 0;
+}
+
+/* === 影片按鈕選單 === */
+.video-menu-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    margin-top: 30px;
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+}
+
+@media (max-width: 768px) {
+    .video-menu-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .video-card {
+        width: 100%;
+        max-width: 100%;
+        height: 250px !important;
+    }
+}
+
+.video-card {
+    position: relative;
+    width: 45%;
+    height: 350px;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s, border 0.3s;
+    border: 2px solid transparent;
+    background: #000;
+}
+
+/* 覆寫 nav-btn 的預設 padding 與背景 */
+.video-card.nav-btn {
+    padding: 0;
+    background-color: transparent;
+}
+
+.video-card:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(77, 166, 255, 0.4);
+    border-color: #4da6ff;
+}
+
+.video-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+}
+
+.video-card:hover video {
+    opacity: 1;
+}
+
+.video-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.2));
+    pointer-events: none;
+}
+
+.video-card-overlay span {
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    transform: translateY(15px);
+    transition: transform 0.3s;
+}
+
+.video-card:hover .video-card-overlay span {
+    transform: translateY(0);
+}
+
+/* === 封面向下捲動指示器 === */
+.scroll-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    animation: fadeInOut 2s infinite;
+}
+
+.arrow-down {
+    font-size: 2rem;
+    color: #4da6ff;
+    animation: bounceDown 2s infinite;
+}
+
+@keyframes bounceDown {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(10px);
+    }
+
+    60% {
+        transform: translateY(5px);
+    }
+}
+
+@keyframes fadeInOut {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* === 分割螢幕選單 (Split Screen Menu) === */
+.split-screen-menu {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    background-color: #000;
+}
+
+@media (max-width: 768px) {
+    .split-screen-menu {
+        flex-direction: column;
+    }
+}
+
+.split-pane {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    cursor: pointer;
+    overflow: hidden;
+    transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.split-pane:hover {
+    flex: 1.3;
+}
+
+.split-pane video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 1;
+    /* 還原影片 100% 原始色彩 */
+    transition: transform 2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.split-pane:hover video {
+    transform: scale(1.05);
+}
+
+.pane-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 僅保留左右兩側極細微 (5%) 的陰影來柔化分割線，中央區域維持 100% 透明，完全不影響影片原色 */
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0%, transparent 5%, transparent 95%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+    transition: background 0.6s ease;
+}
+
+.split-pane:hover .pane-overlay {
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.2) 0%, transparent 2%, transparent 98%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.pane-overlay h2 {
+    color: #fff;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin: 0;
+
+    /* 半透明毛玻璃方框設計 */
+    padding: 12px 24px;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+    /* 弱化原本的文字陰影，因為現在有深色背景襯托 */
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+
+    transform: translateY(0) scale(0.95);
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), background 0.6s, box-shadow 0.6s, border-color 0.6s;
+}
+
+.split-pane:hover .pane-overlay h2 {
+    transform: translateY(0) scale(1.05);
+    background: rgba(15, 23, 42, 0.75);
+    /* 懸停時方框加深，凸顯主體 */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* === 對講機對話介面 (Walkie-Talkie Dialogue) === */
+.walkie-talkie-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 650px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    pointer-events: none;
+    /* 滑鼠穿透，避免阻擋點擊 */
+}
+
+.wt-message {
+    display: flex;
+    flex-direction: column;
+}
+
+.wt-message.msg-left {
+    align-items: flex-start;
+}
+
+.wt-message.msg-right {
+    align-items: flex-end;
+}
+
+/* 將動畫效果下放到各個內部元件，實現循序顯示 */
+.wt-avatar,
+.wt-bubble {
+    opacity: 0;
+}
+
+#pov-video-screen.active .wt-avatar,
+#pov-video-screen.active .wt-bubble {
+    animation: wtFadeInSlide 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* 對話泡泡的外層容器 */
+.wt-bubbles-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* 多個對話泡泡之間的間距 */
+}
+
+/* 訊息出現時間軸 (對講機1, 對講機2, 對講機1, 對講機2) */
+#pov-video-screen.active .msg-step-1-container .wt-avatar,
+#pov-video-screen.active .bubble-1 {
+    animation-delay: 4.5s;
+}
+
+#pov-video-screen.active .msg-step-2-container .wt-avatar,
+#pov-video-screen.active .bubble-2 {
+    animation-delay: 6s;
+}
+
+#pov-video-screen.active .msg-step-3-container .wt-avatar,
+#pov-video-screen.active .bubble-3 {
+    animation-delay: 7.5s;
+}
+
+#pov-video-screen.active .msg-step-4-container .wt-avatar,
+#pov-video-screen.active .bubble-4 {
+    animation-delay: 9s;
+}
+
+
+.wt-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.wt-avatar {
+    position: relative;
+    flex-shrink: 0;
+    width: 45px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 已移除圓形外框、背景色與毛玻璃，讓 SVG 自然浮空 */
+}
+
+/* 移除舊的圓形電波 (Radio Pulse) */
+
+/* 新增 Wi-Fi 波狀電波特效 */
+.wt-waves {
+    position: absolute;
+    top: -20px;
+    left: 4px;
+    /* 對齊對講機天線 */
+    z-index: -1;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+.wave {
+    opacity: 0;
+}
+
+/* 左側發話的波浪動畫 (延遲 6s 開始) */
+#pov-video-screen.active .msg-left .wt-waves .wave-1 {
+    animation: wifiPulse 1.5s infinite 6s;
+}
+
+#pov-video-screen.active .msg-left .wt-waves .wave-2 {
+    animation: wifiPulse 1.5s infinite 6.2s;
+}
+
+#pov-video-screen.active .msg-left .wt-waves .wave-3 {
+    animation: wifiPulse 1.5s infinite 6.4s;
+}
+
+/* 右側發話的波浪動畫 (延遲 7.5s 開始，配合右側穿插的時間) */
+#pov-video-screen.active .msg-right .wt-waves .wave-1 {
+    animation: wifiPulse 1.5s infinite 7.5s;
+}
+
+#pov-video-screen.active .msg-right .wt-waves .wave-2 {
+    animation: wifiPulse 1.5s infinite 7.7s;
+}
+
+#pov-video-screen.active .msg-right .wt-waves .wave-3 {
+    animation: wifiPulse 1.5s infinite 7.9s;
+}
+
+/* 移除舊的延遲動畫，改用容器控制 */
+#pov-video-screen.active .msg-left .wt-avatar {
+    /* 淡入與震動動畫，延遲由外層 container 控制 (利用 inherit 或是分開寫，這裡移除了固定秒數) */
+    animation-name: wtFadeInSlide, wtVibrate;
+    animation-duration: 0.8s, 0.1s;
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275), linear;
+    animation-iteration-count: 1, 10;
+    animation-fill-mode: forwards, none;
+}
+
+#pov-video-screen.active .msg-right .wt-avatar {
+    animation-name: wtFadeInSlide, wtVibrate;
+    animation-duration: 0.8s, 0.1s;
+    animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275), linear;
+    animation-iteration-count: 1, 10;
+    animation-fill-mode: forwards, none;
+}
+
+.wt-bubble {
+    background: #ffffff;
+    border: 3px solid #000000;
+    color: #111111;
+    font-weight: 700;
+    padding: 12px 28px;
+    /* Less vertical, more horizontal padding */
+    width: max-content;
+    /* Force to wrap around content in a single line if possible */
+    white-space: nowrap;
+    /* Prevent text wrapping */
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    /* Hand-drawn comic look */
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 95%;
+    /* Allow it to be long */
+    position: relative;
+    letter-spacing: 1px;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+    /* Hard comic shadow */
+    margin-bottom: 10px;
+}
+
+/* 訊息對話框的尖角 (左側：尾巴朝左，對準左側對講機) */
+.msg-left .wt-bubble {
+    margin-left: 10px;
+    /* Space for the tail */
+}
+
+.msg-left .wt-bubble::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -8px;
+    /* Stick out to the left */
+    transform: translateY(-50%) rotate(45deg);
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border-left: 3px solid #000000;
+    border-bottom: 3px solid #000000;
+    border-bottom-left-radius: 3px;
+    z-index: 1;
+}
+
+/* 訊息對話框的尖角 (右側：尾巴朝右，對準右側對講機) */
+.msg-right .wt-bubble {
+    background: #ffffff;
+    border-color: #000000;
+    color: #111111;
+    box-shadow: -4px 4px 0px rgba(0, 0, 0, 1);
+    margin-right: 10px;
+    /* Space for the tail */
+}
+
+.msg-right .wt-bubble::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -8px;
+    /* Stick out to the right */
+    transform: translateY(-50%) rotate(45deg);
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border-top: 3px solid #000000;
+    border-right: 3px solid #000000;
+    border-top-right-radius: 3px;
+    z-index: 1;
+}
+
+@keyframes wtFadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes wifiPulse {
+    0% {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    70% {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes wtVibrate {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(-1px, 1px);
+    }
+
+    50% {
+        transform: translate(1px, -1px);
+    }
+
+    75% {
+        transform: translate(1px, 1px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+/* =========================================
+   漫畫風格彈出視窗 (Comic Alert Dialog)
+   ========================================= */
+.comic-alert-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: #fffdef;
+    /* 復古微黃紙質感 */
+    border: 4px solid #000000;
+    outline: 2px solid #000000;
+    /* 雙內框設計，展現美式漫畫精緻感 */
+    outline-offset: -8px;
+    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.85);
+    /* 更厚實的陰影 */
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    width: 380px;
+    /* 寬度加大 */
+    z-index: 20;
+    padding: 35px 25px;
+    /* 增加留白 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    /* 增加間距 */
+
+    /* 預設隱藏，由動畫觸發 */
+    opacity: 0;
+    pointer-events: none;
+}
+
+.lifesaver-badge {
+    position: absolute;
+    top: -40px;
+    left: -40px;
+    transform: rotate(-15deg);
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.85));
+    z-index: 25;
+}
+
+/* 當視窗進入 active 狀態時，10秒後彈出 */
+#pov-video-screen.active .comic-alert-dialog {
+    animation: popInComic 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 10s forwards;
+}
+
+@keyframes popInComic {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5) translateY(50px);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.05) translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* 放大一點點 (scale 1.05) */
+}
+
+.comic-alert-video-container {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 4px solid #000000;
+    box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.85);
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.comic-alert-video-container video {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.7);
+    /* 調回上一版的亮度 */
+}
+
+.comic-alert-text {
+    font-size: 1.9rem;
+    /* 字體稍微加大 */
+    color: #111;
+    margin: 0;
+    font-weight: 800;
+    /* 更粗的字體 */
+    line-height: 1.4;
+    text-align: center;
+    letter-spacing: 3px;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.15);
+    /* 增加細微文字陰影，更精緻 */
+}
+
+.comic-alert-btn {
+    background: #ffffff;
+    /* 維持白色，不填塞 */
+    color: #dc2626;
+    /* 使用警告紅色字體 */
+    border: 4px solid #000000;
+    /* 更粗的按鈕框線 */
+    padding: 14px 28px;
+    font-size: 1.7rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    cursor: pointer;
+    box-shadow: 5px 5px 0px #111111;
+    border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+    transition: transform 0.1s, box-shadow 0.1s, background 0.2s, color 0.2s;
+    margin-top: 10px;
+}
+
+.comic-alert-btn:active,
+.comic-alert-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0px #111111;
+    background: #dc2626;
+    /* 點擊/滑過填入紅色 */
+    color: #ffffff;
+}
+
+/* 對話框整體在提示框出現時自動消失 */
+#pov-video-screen.active .walkie-talkie-container {
+    animation: fadeOutContainer 0.4s ease-out 10s forwards;
+}
+
+@keyframes fadeOutContainer {
+    0% {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    100% {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+/* =========================================
+   全域快速跳轉進入遊戲按鈕 (右下角)
+   ========================================= */
+.quick-game-btn {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    z-index: 99;
+    background: #ffffff; /* 內填白色 */
+    color: #000000; /* 黑色字體 */
+    border: 3px solid #000000; /* 黑邊 */
+    padding: 10px 18px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.85); /* 黑色立體陰影 */
+    border-radius: 12px 55px 12px 55px / 55px 12px 55px 12px; /* 漫畫風格圓角 */
+    transition: transform 0.1s, box-shadow 0.1s, background 0.2s, color 0.2s;
+}
+
+.quick-game-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #111111;
+    background: #dc2626; /* 點擊/滑過後填入紅色 */
+    color: #ffffff; /* 文字轉白 */
+}
+
+/* =========================================
+   互動圓餅圖樣式 (Pie Chart Styles)
+   ========================================= */
+.chart-subtitle {
+    color: #a3a3a3;
+    font-size: 1rem;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.pie-chart-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    margin: 20px auto;
+    max-width: 800px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .pie-chart-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+}
+
+.pie-chart-wrapper {
+    position: relative;
+    width: 440px;
+    height: 440px;
+    flex-shrink: 0;
+}
+
+#pie-chart {
+    width: 100%;
+    height: 100%;
+}
+
+#pie-slices path {
+    cursor: default;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+    transform-origin: 250px 250px;
+}
+
+#pie-slices path:hover {
+    transform: scale(1.05);
+    opacity: 0.95;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+/* 甜甜圈圓心數據 */
+.chart-center-info {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-title {
+    font-size: 0.85rem;
+    color: #6b5f4a;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.center-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #2d2a22;
+    line-height: 1;
+    margin: 3px 0;
+}
+
+.center-unit {
+    font-size: 0.85rem;
+    color: #7a6e5a;
+}
+
+/* === 懸浮提示框 (Floating Tooltip) === */
+.floating-tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: rgba(17, 17, 17, 0.95);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    padding: 12px 18px;
+    border-radius: 8px;
+    z-index: 1000;
+    opacity: 0;
+    white-space: nowrap; /* 避免文字折行造成版面混亂 */
+    transform: translate(-50%, -100%) translateY(-15px);
+    transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1), transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.floating-tooltip.active {
+    opacity: 1;
+    transform: translate(-50%, -100%) translateY(-10px);
+}
+
+.floating-tooltip-row {
+    color: #ffffff !important; /* 數據顯示的字體都是白的 */
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.floating-tooltip-sub {
+    color: #ffffff !important; /* 數據顯示的字體都是白的 */
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+/* === 圓餅圖最大區塊閃爍警示與 Hover 覆寫 === */
+@keyframes pulse-slice {
+    0% {
+        opacity: 1;
+        filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.05));
+    }
+    50% {
+        opacity: 0.75;
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.05));
+    }
+}
+
+.pulse-warning {
+    animation: pulse-slice 2.2s infinite ease-in-out;
+}
+
+#pie-slices path.pulse-warning:hover {
+    animation: none !important;
+    transform: scale(1.06) !important;
+    opacity: 1 !important;
+    filter: drop-shadow(0 4px 15px rgba(255, 255, 255, 0.4)) !important;
+}
+
+/* 封面影片背景 */
+.bg-video-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+/* 統計頁面白色主題樣式 */
+#stats-screen .center-value {
+    color: #0f172a !important;
+}
+#stats-screen .center-title {
+    color: #64748b !important;
+}
+#stats-screen .center-unit {
+    color: #64748b !important;
+}
+
+/* ===================================================
+   【高階嵌入核心】Sticky 獨立時間軸容器
+   =================================================== */
+#interactive-timeline-screen {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #0f0f0f;
+    font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif !important;
+    text-align: left !important;
+}
+
+.timeline-interactive-section {
+    position: relative;
+    width: 100%;
+    height: 5800px; /* 實體長縱深滾動軌道，掌管 12 個步驟的滾動軸長 */
+    z-index: 2;
+}
+
+/* 黏性視窗：當本區塊進入視野時，會自動定格鎖定 100vh，直到 5800px 軌道滾完為止 */
+.timeline-interactive-section .sticky-viewport {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* 背景容器 */
+.timeline-interactive-section .bg-container {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.timeline-interactive-section .bg-video-timeline {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.timeline-interactive-section .bg-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(180deg, rgba(10,15,25,0.55) 0%, rgba(10,15,25,0.75) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.timeline-interactive-section .bg-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 45%;
+    background: linear-gradient(to top, rgba(10,15,25,0.85) 0%, transparent 100%);
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* 專區專屬進度條：固定鎖在互動視窗的最頂端 */
+.timeline-interactive-section .progress-bar {
+    position: absolute;
+    top: 0; left: 0;
+    height: 2px; width: 0%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    z-index: 100;
+    transition: width 0.15s ease;
+}
+
+/* 章節徽章（轉為 absolute 內置定位） */
+.timeline-interactive-section .chapter-badge {
+    position: absolute;
+    top: 32px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 100px;
+    padding: 6px 16px 6px 10px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.timeline-interactive-section .chapter-badge.visible { opacity: 1; }
+.timeline-interactive-section .chapter-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #60a5fa;
+    flex-shrink: 0;
+}
+.timeline-interactive-section .chapter-badge span {
+    font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif !important;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+}
+
+/* 右側定位導覽圓點（轉為 absolute 內置定位） */
+.timeline-interactive-section .step-dots {
+    position: absolute;
+    right: 24px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.timeline-interactive-section .step-dots.visible { opacity: 1; }
+.timeline-interactive-section .step-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+.timeline-interactive-section .step-dot.active { background: rgba(255,255,255,0.85); transform: scale(1.4); }
+.timeline-interactive-section .step-dot.done   { background: rgba(255,255,255,0.45); }
+
+/* 字卡總大樓容器（轉為 absolute 內置定位，維持最完美的底往上 reverse 堆疊地基） */
+.timeline-interactive-section .chat-timeline-container {
+    position: absolute;
+    bottom: 40px; left: 50%;
+    transform: translateX(-50%) translateY(0);
+    width: 90%; max-width: 660px;
+    height: auto;
+    display: flex;
+    flex-direction: column-reverse; 
+    justify-content: flex-start;
+    pointer-events: none;
+    z-index: 10;
+    transition: 
+        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.6s ease;
+}
+
+/* 單條對話訊息列（100% 沿用你最滿意的原生動態邏輯與寬高） */
+.timeline-interactive-section .message-row {
+    width: 100%;
+    display: flex;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(35px);
+    margin-top: 0;
+    overflow: hidden;
+    transition: 
+        max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.4s ease-out,
+        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        margin-top 0.6s ease;
+}
+
+.timeline-interactive-section .message-row.visible {
+    max-height: 400px;
+    opacity: 1;
+    transform: translateY(0);
+    margin-top: 14px;
+}
+
+.timeline-interactive-section .message-row.faded-bottom {
+    opacity: 0 !important;
+    transform: translateY(-15px) scale(0.97);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.timeline-interactive-section .message-row.align-left  { justify-content: flex-start; }
+.timeline-interactive-section .message-row.align-right { justify-content: flex-end; }
+
+/* 泡泡本體樣式與粗黑邊漫畫風 */
+.timeline-interactive-section .bubble {
+    background: rgba(255,255,255,0.97);
+    border: 2.5px solid #1a1a2e;
+    color: #111;
+    padding: 13px 18px 14px;
+    max-width: 80%;
+    box-sizing: border-box;
+    position: relative;
+    letter-spacing: 0.02em;
+    white-space: normal !important;
+}
+
+/* 左側泡泡與小尾巴 */
+.timeline-interactive-section .align-left .bubble {
+    border-radius: 18px 18px 18px 4px;
+    box-shadow: 4px 4px 0px rgba(20,20,40,0.85);
+    margin-left: 10px;
+}
+.timeline-interactive-section .align-left .bubble::before {
+    content: ''; position: absolute; bottom: 8px; left: -10px; width: 0; height: 0;
+    border-style: solid; border-width: 6px 10px 6px 0; border-color: transparent #1a1a2e transparent transparent;
+}
+.timeline-interactive-section .align-left .bubble::after {
+    content: ''; position: absolute; bottom: 9px; left: -6px; width: 0; height: 0;
+    border-style: solid; border-width: 5px 8px 5px 0; border-color: transparent rgba(255,255,255,0.97) transparent transparent;
+}
+
+/* 右側泡泡與小尾巴 */
+.timeline-interactive-section .align-right .bubble {
+    border-radius: 18px 18px 4px 18px;
+    box-shadow: -4px 4px 0px rgba(20,20,40,0.85);
+    margin-right: 10px;
+}
+.timeline-interactive-section .align-right .bubble::before {
+    content: ''; position: absolute; bottom: 8px; right: -10px; width: 0; height: 0;
+    border-style: solid; border-width: 6px 0 6px 10px; border-color: transparent transparent transparent #1a1a2e;
+}
+.timeline-interactive-section .align-right .bubble::after {
+    content: ''; position: absolute; bottom: 9px; right: -6px; width: 0; height: 0;
+    border-style: solid; border-width: 5px 0 5px 8px; border-color: transparent transparent transparent rgba(255,255,255,0.97);
+}
+
+/* 高亮核心宣告（第 10、11 步紅框調色） */
+.timeline-interactive-section .message-row.highlight .bubble {
+    background: #fffbea;
+    border-color: #c0392b;
+}
+.timeline-interactive-section .align-left.highlight  .bubble { box-shadow: 4px 4px 0px #c0392b; }
+.timeline-interactive-section .align-left.highlight  .bubble::before { border-color: transparent #c0392b transparent transparent; }
+.timeline-interactive-section .align-left.highlight  .bubble::after  { border-color: transparent #fffbea transparent transparent; }
+.timeline-interactive-section .align-right.highlight .bubble { box-shadow: -4px 4px 0px #c0392b; }
+.timeline-interactive-section .align-right.highlight .bubble::before { border-color: transparent transparent transparent #c0392b; }
+.timeline-interactive-section .align-right.highlight .bubble::after  { border-color: transparent transparent transparent #fffbea; }
+.timeline-interactive-section .message-row.highlight .author { color: #c0392b; }
+
+/* 第 12 步總結文字框置中樣式 */
+.timeline-interactive-section .message-row.summary-row {
+    justify-content: center; 
+}
+.timeline-interactive-section .summary-row .bubble {
+    max-width: 100%; 
+    width: 100%;
+    background: rgba(255,255,255,0.97); 
+    border: 2.5px solid #1a1a2e; 
+    border-radius: 18px; 
+    box-shadow: 4px 4px 0px rgba(20,20,40,0.85); 
+    padding: 14px 20px; 
+}
+.timeline-interactive-section .summary-row .bubble::before,
+.timeline-interactive-section .bubble::after {
+    display: none !important;
+}
+
+.timeline-interactive-section .author {
+    font-size: 0.72rem;
+    color: #6b7280;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.timeline-interactive-section .quote {
+    font-size: 0.97rem;
+    line-height: 1.65;
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+
+/* 確保父容器在這一頁被打開時，也不要鎖死滾動 */
+#app-container {
+    /* 如果原本有寫 overflow: hidden，請確保在長捲動頁面時能解鎖 */
+    overflow: visible !important; 
+}
+
+/* 溪流文字介紹頁專屬樣式 */
+.river-text-page-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    box-sizing: border-box;
+    color: #f5f5f5;
+    text-align: left;
+}
+
+.river-text-page-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.danger-badge {
+    display: inline-block;
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 6px 16px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+}
+
+.river-text-page-header h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+.river-text-page-header .subtitle {
+    font-size: 1.1rem;
+    color: #a3a3a3;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+.river-danger-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 50px;
+}
+
+.danger-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.danger-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #ef4444, #f97316);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.danger-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.danger-card:hover::before {
+    opacity: 1;
+}
+
+.card-num {
+    font-size: 2.5rem;
+    font-weight: 800;
+    font-family: 'Helvetica Neue', Arial;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.6) 0%, rgba(249, 115, 22, 0.2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+.danger-card h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.danger-card p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #a3a3a3;
+    margin-bottom: 0;
+}
+
+/* 訓練總結頁跳轉選單按鈕樣式 */
+.screen #training-outro-screen-btn {
+    background-color: #8a7a62 !important;
+    color: #fdfbf8 !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(138, 122, 98, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.screen #training-outro-screen-btn:hover {
+    background-color: #72624d !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(138, 122, 98, 0.5) !important;
+}
+
+.screen #training-outro-screen-btn:active {
+    transform: translateY(1px) !important;
+}

@@ -1,0 +1,2361 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>救生員專題 Prototype</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app-container">
+
+        <!-- 1. 封面頁 -->
+        <section id="cover-screen" class="screen active">
+            <!-- 封面背景影片 -->
+            <video class="bg-video-cover" autoplay muted playsinline
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
+                <source src="封面.mp4" type="video/mp4">
+            </video>
+            <!-- 漸層遮罩，讓文字更易讀 -->
+            <div
+                style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); z-index: 1; pointer-events: none;">
+            </div>
+            <!-- 底部提示文字 (絕對定位於最底部) -->
+            <div
+                style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; pointer-events: none;">
+                <div class="arrow-down">↓</div>
+            </div>
+        </section>
+
+        <!-- 1.1. 獨立時間軸互動頁 -->
+        <section id="interactive-timeline-screen" class="screen">
+            <div class="timeline-interactive-section" id="interactive-timeline-module">
+                <div class="sticky-viewport">
+
+                    <div class="progress-bar" id="progress"></div>
+
+                    <div class="bg-container" id="bg">
+                        <video class="bg-video-timeline" autoplay muted playsinline loop>
+                            <source src="對話框底圖.mp4" type="video/mp4">
+                        </video>
+                        <div class="bg-overlay"></div>
+                    </div>
+
+                    <div class="chapter-badge" id="badge" style="display: none !important;">
+                        <div class="dot"></div>
+                        <span>浪尖上的局外人</span>
+                    </div>
+
+                    <div class="step-dots" id="stepDots"></div>
+
+                    <div class="chat-timeline-container" id="chat-container">
+
+                        <div class="message-row align-left" data-step="1">
+                            <div class="bubble">
+                                <span class="author">烏石港海灘救生員 廖家君</span>
+                                <div class="quote">「海邊救生員待遇沒那麼好，也沒有真的按照勞基法。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-right" data-step="2">
+                            <div class="bubble">
+                                <span class="author">白沙灣救生員 劉邦禾</span>
+                                <div class="quote">「像我住新莊，來回就要兩個小時，真的要靠熱忱，其實這個工作很難當正職。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-left" data-step="3">
+                            <div class="bubble">
+                                <span class="author">烏石港海灘救生員 廖家君</span>
+                                <div class="quote">「一般室內救生員不一定可以來這裡，除了有證照之外，還要會看流，自己也要有體力狂水、衝浪。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-right" data-step="4">
+                            <div class="bubble">
+                                <span class="author">烏石港海灘救生員 廖家君</span>
+                                <div class="quote">「救生員工作越來越少人做，尤其是海邊的，因為他就是半年一聘。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-left" data-step="5">
+                            <div class="bubble">
+                                <span class="author">烏石港海灘救生員 渚樺（化名）</span>
+                                <div class="quote">「這工作很熱很累，他們也沒請幾個人，然後要你看全部的海邊，我們連沙灘車也沒有，只能用走的。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-right" data-step="6">
+                            <div class="bubble">
+                                <span class="author">白沙灣救生員 闕河聖</span>
+                                <div class="quote">「游泳池不會有風，不會有流，我們就是要曬太陽還要常常下水，打連一個像樣的救生塔都沒有。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-left" data-step="7">
+                            <div class="bubble">
+                                <span class="author">白沙灣救生員 闕河聖</span>
+                                <div class="quote">「整個救生的環境還是把他當一個管理員，可是我們是第一線。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-right" data-step="8">
+                            <div class="bubble">
+                                <span class="author">前烏石港海灘救生員 Benny（化名）</span>
+                                <div class="quote">「我們危險程度真的很高，所以薪水沒有很高的時候，我們不一定會想要做海邊救生員，就做游泳池就好了啊。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-left" data-step="9">
+                            <div class="bubble">
+                                <span class="author">白沙灣救生員 闕河聖</span>
+                                <div class="quote">「坦白講，不理性的遊客很多，我們又沒有公權力，吸菸、找廁所什麼都要我管。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-right highlight" data-step="10">
+                            <div class="bubble">
+                                <span class="author">廖國盛</span>
+                                <div class="quote">「不是說要在救生這方面賺到多少錢，我只是想不要再讓這麼多年輕人因為不懂自救，無辜浪費生命。」</div>
+                            </div>
+                        </div>
+
+                        <div class="message-row align-left highlight" data-step="11">
+                            <div class="bubble">
+                                <span class="author">白沙灣救生員 闕河聖</span>
+                                <div class="quote">
+                                    「會來這邊當救生員的，都是對海洋有熱忱。我今天純粹是想把我最後的價值傳承下去，自己有沒有辦法成功我也不樂觀，因為我自己都對這個體制很失望了，只是每年又到了這個時候，就會覺得還是有這個責任。」
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-row summary-row" data-step="12">
+                            <div class="bubble">
+                                <div class="quote">
+                                    從泳池、溪流到海邊，迴盪著民眾的嘻笑喧鬧，現場卻不見救生員身影，抑或廣大場域僅有兩三位救生員看顧，默默守護這些笑容的救生員面臨嚴重缺工，敲響了水域安全的警鐘。
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.4. 救生員視角 POV 影片前導文字頁 -->
+        <section id="pov-intro-screen" class="screen"
+            style="display: flex; flex-direction: row; padding: 0; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%); overflow: hidden; align-items: stretch; justify-content: stretch;">
+            <style>
+                #pov-intro-screen {
+                    display: flex;
+                    flex-direction: row;
+                }
+
+                .pov-intro-video-half {
+                    flex: 1.2;
+                    height: 100%;
+                    position: relative;
+                    background: #000;
+                    overflow: hidden;
+                    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+                }
+
+                .pov-intro-text-half {
+                    flex: 1;
+                    height: 100%;
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 60px 40px 60px 0px;
+                    margin-left: -5%;
+                    z-index: 1;
+                }
+
+                @media (max-width: 768px) {
+                    #pov-intro-screen {
+                        flex-direction: column !important;
+                    }
+
+                    .pov-intro-video-half {
+                        height: 45vh !important;
+                        flex: none !important;
+                        width: 100% !important;
+                        clip-path: none !important;
+                    }
+
+                    .pov-intro-text-half {
+                        height: 55vh !important;
+                        flex: none !important;
+                        width: 100% !important;
+                        padding: 30px 20px 80px 20px !important;
+                    }
+                }
+            </style>
+
+            <!-- 左側滿版影片 -->
+            <div class="pov-intro-video-half">
+                <video autoplay loop muted playsinline
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                    <source src="海邊危險左邊.mp4" type="video/mp4">
+                </video>
+            </div>
+
+            <!-- 右側文字區 -->
+            <div class="pov-intro-text-half">
+                <!-- 裝飾性光暈層 -->
+                <div
+                    style="position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(210,185,140,0.15) 0%, transparent 65%); pointer-events: none; z-index: 0;">
+                </div>
+
+                <div style="max-width: 540px; width: 100%; position: relative; z-index: 1; text-align: left;">
+                    <p
+                        style="color: #5a4f3c; font-size: 1.15rem; line-height: 1.95; margin-bottom: 1.5em; letter-spacing: 0.5px;">
+                        看似平靜的大海，實則是由洋流、風向、地形和潮汐交織而成的動態水域。由於水域範圍廣大，再加上危險的成因複雜，救生員若沒有開放水域相關經驗，不僅增加民眾從事水域活動的安全風險，更會讓救生員陷於危險職場中。
+                    </p>
+                    <p
+                        style="color: #2d2a22; font-size: 1.15rem; line-height: 1.95; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 0;">
+                        接下來，我們以第一線救生人員的角度出發，直擊海邊值勤需要注意各種狀況：
+                    </p>
+                </div>
+
+                <!-- 底部提示文字 (絕對定位於最底部) -->
+                <div
+                    style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; pointer-events: none;">
+                    <p style="font-size: 0.9rem; color: #8a7a62; margin-bottom: 10px;">向下捲動進入救援現場</p>
+                    <div class="arrow-down" style="color: #8a7a62;">↓</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.5. 救生員視角 POV 影片 -->
+        <section id="pov-video-screen" class="screen" style="background-color: #000; padding: 0;">
+            <video id="pov-video" playsinline muted
+                style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; opacity: 1; filter: brightness(0.7); transform: scaleX(-1);">
+                <source src="海邊第一視角.mp4" type="video/mp4">
+            </video>
+            <!-- 右下角快速進入遊戲按鈕 -->
+            <button class="nav-btn quick-game-btn" data-target="game-screen">直接進入遊戲</button>
+
+            <!-- 對講機對話疊加層 -->
+            <div class="walkie-talkie-container">
+                <div class="wt-message msg-left msg-step-1-container">
+                    <div class="wt-body">
+                        <div class="wt-avatar">
+                            <!-- Wi-Fi 波狀發射特效 -->
+                            <svg class="wt-waves" viewBox="0 0 100 100" width="28" height="28"
+                                xmlns="http://www.w3.org/2000/svg" style="color: #4da6ff;">
+                                <path class="wave wave-3" d="M 10 50 A 40 40 0 0 1 90 50" fill="none"
+                                    stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                <path class="wave wave-2" d="M 30 70 A 20 20 0 0 1 70 70" fill="none"
+                                    stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                <circle class="wave wave-1" cx="50" cy="90" r="10" fill="currentColor" />
+                            </svg>
+                            <!-- 寫實向量風格對講機 (左側：藍色按鈕) -->
+                            <svg viewBox="0 0 100 250" width="45" height="110" xmlns="http://www.w3.org/2000/svg"
+                                style="filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5));">
+                                <!-- 天線尖端 -->
+                                <rect x="28" y="10" width="8" height="15" rx="2" fill="#333" />
+                                <rect x="29" y="12" width="6" height="11" rx="1" fill="#1a1a1a" />
+                                <!-- 天線主體 -->
+                                <polygon points="30,25 34,25 33,85 31,85" fill="#333" />
+                                <!-- 天線基座 (帶紋理) -->
+                                <rect x="29" y="85" width="6" height="15" fill="#444" />
+                                <rect x="28" y="88" width="8" height="2" fill="#111" />
+                                <rect x="28" y="92" width="8" height="2" fill="#111" />
+                                <rect x="28" y="96" width="8" height="2" fill="#111" />
+
+                                <!-- 中間旋鈕 -->
+                                <path d="M48 100 L48 85 C48 82 56 82 56 85 L56 100 Z" fill="#333" />
+                                <rect x="49" y="86" width="6" height="2" fill="#111" />
+                                <rect x="49" y="90" width="6" height="2" fill="#111" />
+                                <!-- 右側小旋鈕 -->
+                                <path d="M64 100 L64 90 C64 88 70 88 70 90 L70 100 Z" fill="#333" />
+
+                                <!-- 左側 PTT 發話按鈕 (藍色區分頻道) -->
+                                <rect x="18" y="140" width="6" height="25" rx="2" fill="#3b82f6" />
+                                <!-- 左側小按鍵 -->
+                                <rect x="18" y="125" width="4" height="10" rx="1" fill="#444" />
+                                <rect x="18" y="170" width="4" height="10" rx="1" fill="#444" />
+
+                                <!-- 機身背板 -->
+                                <rect x="20" y="100" width="64" height="140" rx="8" fill="#2a2a2a" />
+                                <!-- 機身邊緣導角 -->
+                                <path
+                                    d="M 22 108 L 22 232 Q 22 238 28 238 L 76 238 Q 82 238 82 232 L 82 108 Q 82 102 76 102 L 28 102 Q 22 102 22 108"
+                                    fill="#383838" />
+                                <!-- 機身內部核心 -->
+                                <rect x="25" y="105" width="54" height="130" rx="4" fill="#222" />
+
+                                <!-- 頂部螢幕/銘牌 -->
+                                <rect x="32" y="110" width="40" height="15" rx="3" fill="#1a1a1a" />
+
+                                <!-- 揚聲器柵欄區塊 -->
+                                <rect x="28" y="130" width="48" height="55" rx="4" fill="#2a2a2a" />
+                                <rect x="30" y="132" width="44" height="51" rx="2" fill="#1a1a1a" />
+                                <!-- 柵欄開孔 -->
+                                <rect x="34" y="136" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="144" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="152" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="160" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="168" width="36" height="4" rx="1" fill="#000" />
+
+                                <!-- 底部電池槽 -->
+                                <rect x="28" y="190" width="48" height="40" rx="3" fill="#2a2a2a" />
+                                <rect x="30" y="192" width="44" height="36" rx="2" fill="#1a1a1a" />
+                                <path d="M 35 195 L 69 195 C 72 195 72 225 69 225 L 35 225 C 32 225 32 195 35 195"
+                                    fill="#222" />
+                            </svg>
+                        </div>
+                        <div class="wt-bubbles-wrapper">
+                            <div class="wt-bubble bubble-1">
+                                欸，關注一下右邊的遊客
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wt-message msg-right msg-step-2-container">
+                    <div class="wt-body">
+                        <div class="wt-bubbles-wrapper">
+                            <div class="wt-bubble bubble-2">
+                                注意看，那邊有流啦！
+                            </div>
+                        </div>
+                        <div class="wt-avatar">
+                            <!-- Wi-Fi 波狀發射特效 -->
+                            <svg class="wt-waves" viewBox="0 0 100 100" width="28" height="28"
+                                xmlns="http://www.w3.org/2000/svg" style="color: #ff9632;">
+                                <path class="wave wave-3" d="M 10 50 A 40 40 0 0 1 90 50" fill="none"
+                                    stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                <path class="wave wave-2" d="M 30 70 A 20 20 0 0 1 70 70" fill="none"
+                                    stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                <circle class="wave wave-1" cx="50" cy="90" r="10" fill="currentColor" />
+                            </svg>
+                            <!-- 寫實向量風格對講機 (右側：橘色按鈕) -->
+                            <svg viewBox="0 0 100 250" width="45" height="110" xmlns="http://www.w3.org/2000/svg"
+                                style="filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5));">
+                                <!-- 天線尖端 -->
+                                <rect x="28" y="10" width="8" height="15" rx="2" fill="#333" />
+                                <rect x="29" y="12" width="6" height="11" rx="1" fill="#1a1a1a" />
+                                <!-- 天線主體 -->
+                                <polygon points="30,25 34,25 33,85 31,85" fill="#333" />
+                                <!-- 天線基座 -->
+                                <rect x="29" y="85" width="6" height="15" fill="#444" />
+                                <rect x="28" y="88" width="8" height="2" fill="#111" />
+                                <rect x="28" y="92" width="8" height="2" fill="#111" />
+                                <rect x="28" y="96" width="8" height="2" fill="#111" />
+
+                                <!-- 中間旋鈕 -->
+                                <path d="M48 100 L48 85 C48 82 56 82 56 85 L56 100 Z" fill="#333" />
+                                <rect x="49" y="86" width="6" height="2" fill="#111" />
+                                <rect x="49" y="90" width="6" height="2" fill="#111" />
+                                <!-- 右側小旋鈕 -->
+                                <path d="M64 100 L64 90 C64 88 70 88 70 90 L70 100 Z" fill="#333" />
+
+                                <!-- 左側 PTT 發話按鈕 (橘色) -->
+                                <rect x="18" y="140" width="6" height="25" rx="2" fill="#f97316" />
+                                <!-- 左側小按鍵 -->
+                                <rect x="18" y="125" width="4" height="10" rx="1" fill="#444" />
+                                <rect x="18" y="170" width="4" height="10" rx="1" fill="#444" />
+
+                                <!-- 機身背板 -->
+                                <rect x="20" y="100" width="64" height="140" rx="8" fill="#2a2a2a" />
+                                <!-- 機身邊緣導角 -->
+                                <path
+                                    d="M 22 108 L 22 232 Q 22 238 28 238 L 76 238 Q 82 238 82 232 L 82 108 Q 82 102 76 102 L 28 102 Q 22 102 22 108"
+                                    fill="#383838" />
+                                <!-- 機身內部核心 -->
+                                <rect x="25" y="105" width="54" height="130" rx="4" fill="#222" />
+
+                                <!-- 頂部螢幕/銘牌 -->
+                                <rect x="32" y="110" width="40" height="15" rx="3" fill="#1a1a1a" />
+
+                                <!-- 揚聲器柵欄區塊 -->
+                                <rect x="28" y="130" width="48" height="55" rx="4" fill="#2a2a2a" />
+                                <rect x="30" y="132" width="44" height="51" rx="2" fill="#1a1a1a" />
+                                <!-- 柵欄開孔 -->
+                                <rect x="34" y="136" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="144" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="152" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="160" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="168" width="36" height="4" rx="1" fill="#000" />
+
+                                <!-- 底部電池槽 -->
+                                <rect x="28" y="190" width="48" height="40" rx="3" fill="#2a2a2a" />
+                                <rect x="30" y="192" width="44" height="36" rx="2" fill="#1a1a1a" />
+                                <path d="M 35 195 L 69 195 C 72 195 72 225 69 225 L 35 225 C 32 225 32 195 35 195"
+                                    fill="#222" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="wt-message msg-left msg-step-3-container">
+                    <div class="wt-body">
+                        <div class="wt-avatar">
+                            <!-- Wi-Fi 波狀發射特效 -->
+                            <svg class="wt-waves" viewBox="0 0 100 100" width="28" height="28"
+                                xmlns="http://www.w3.org/2000/svg" style="color: #4da6ff;">
+                                <path class="wave wave-3" d="M 10 50 A 40 40 0 0 1 90 50" fill="none"
+                                    stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                <path class="wave wave-2" d="M 30 70 A 20 20 0 0 1 70 70" fill="none"
+                                    stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                <circle class="wave wave-1" cx="50" cy="90" r="10" fill="currentColor" />
+                            </svg>
+                            <!-- 寫實向量風格對講機 (左側：藍色按鈕) -->
+                            <svg viewBox="0 0 100 250" width="45" height="110" xmlns="http://www.w3.org/2000/svg"
+                                style="filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5));">
+                                <!-- 天線尖端 -->
+                                <rect x="28" y="10" width="8" height="15" rx="2" fill="#333" />
+                                <rect x="29" y="12" width="6" height="11" rx="1" fill="#1a1a1a" />
+                                <!-- 天線主體 -->
+                                <polygon points="30,25 34,25 33,85 31,85" fill="#333" />
+                                <!-- 天線基座 (帶紋理) -->
+                                <rect x="29" y="85" width="6" height="15" fill="#444" />
+                                <rect x="28" y="88" width="8" height="2" fill="#111" />
+                                <rect x="28" y="92" width="8" height="2" fill="#111" />
+                                <rect x="28" y="96" width="8" height="2" fill="#111" />
+
+                                <!-- 中間旋鈕 -->
+                                <path d="M48 100 L48 85 C48 82 56 82 56 85 L56 100 Z" fill="#333" />
+                                <rect x="49" y="86" width="6" height="2" fill="#111" />
+                                <rect x="49" y="90" width="6" height="2" fill="#111" />
+                                <!-- 右側小旋鈕 -->
+                                <path d="M64 100 L64 90 C64 88 70 88 70 90 L70 100 Z" fill="#333" />
+
+                                <!-- 左側 PTT 發話按鈕 (藍色區分頻道) -->
+                                <rect x="18" y="140" width="6" height="25" rx="2" fill="#3b82f6" />
+                                <!-- 左側小按鍵 -->
+                                <rect x="18" y="125" width="4" height="10" rx="1" fill="#444" />
+                                <rect x="18" y="170" width="4" height="10" rx="1" fill="#444" />
+
+                                <!-- 機身背板 -->
+                                <rect x="20" y="100" width="64" height="140" rx="8" fill="#2a2a2a" />
+                                <!-- 機身邊緣導角 -->
+                                <path
+                                    d="M 22 108 L 22 232 Q 22 238 28 238 L 76 238 Q 82 238 82 232 L 82 108 Q 82 102 76 102 L 28 102 Q 22 102 22 108"
+                                    fill="#383838" />
+                                <!-- 機身內部核心 -->
+                                <rect x="25" y="105" width="54" height="130" rx="4" fill="#222" />
+
+                                <!-- 頂部螢幕/銘牌 -->
+                                <rect x="32" y="110" width="40" height="15" rx="3" fill="#1a1a1a" />
+
+                                <!-- 揚聲器柵欄區塊 -->
+                                <rect x="28" y="130" width="48" height="55" rx="4" fill="#2a2a2a" />
+                                <rect x="30" y="132" width="44" height="51" rx="2" fill="#1a1a1a" />
+                                <!-- 柵欄開孔 -->
+                                <rect x="34" y="136" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="144" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="152" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="160" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="168" width="36" height="4" rx="1" fill="#000" />
+
+                                <!-- 底部電池槽 -->
+                                <rect x="28" y="190" width="48" height="40" rx="3" fill="#2a2a2a" />
+                                <rect x="30" y="192" width="44" height="36" rx="2" fill="#1a1a1a" />
+                                <path d="M 35 195 L 69 195 C 72 195 72 225 69 225 L 35 225 C 32 225 32 195 35 195"
+                                    fill="#222" />
+                            </svg>
+                        </div>
+                        <div class="wt-bubbles-wrapper">
+                            <div class="wt-bubble bubble-3">
+                                他已經在往外飄了！
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wt-message msg-right msg-step-4-container">
+                    <div class="wt-body">
+                        <div class="wt-bubbles-wrapper">
+                            <div class="wt-bubble bubble-4">
+                                最近的夥伴趕緊過去支援。
+                            </div>
+                        </div>
+                        <div class="wt-avatar">
+                            <!-- Wi-Fi 波狀發射特效 -->
+                            <svg class="wt-waves" viewBox="0 0 100 100" width="28" height="28"
+                                xmlns="http://www.w3.org/2000/svg" style="color: #ff9632;">
+                                <path class="wave wave-3" d="M 10 50 A 40 40 0 0 1 90 50" fill="none"
+                                    stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                <path class="wave wave-2" d="M 30 70 A 20 20 0 0 1 70 70" fill="none"
+                                    stroke="currentColor" stroke-width="10" stroke-linecap="round" />
+                                <circle class="wave wave-1" cx="50" cy="90" r="10" fill="currentColor" />
+                            </svg>
+                            <!-- 寫實向量風格對講機 (右側：橘色按鈕) -->
+                            <svg viewBox="0 0 100 250" width="45" height="110" xmlns="http://www.w3.org/2000/svg"
+                                style="filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5));">
+                                <!-- 天線尖端 -->
+                                <rect x="28" y="10" width="8" height="15" rx="2" fill="#333" />
+                                <rect x="29" y="12" width="6" height="11" rx="1" fill="#1a1a1a" />
+                                <!-- 天線主體 -->
+                                <polygon points="30,25 34,25 33,85 31,85" fill="#333" />
+                                <!-- 天線基座 -->
+                                <rect x="29" y="85" width="6" height="15" fill="#444" />
+                                <rect x="28" y="88" width="8" height="2" fill="#111" />
+                                <rect x="28" y="92" width="8" height="2" fill="#111" />
+                                <rect x="28" y="96" width="8" height="2" fill="#111" />
+
+                                <!-- 中間旋鈕 -->
+                                <path d="M48 100 L48 85 C48 82 56 82 56 85 L56 100 Z" fill="#333" />
+                                <rect x="49" y="86" width="6" height="2" fill="#111" />
+                                <rect x="49" y="90" width="6" height="2" fill="#111" />
+                                <!-- 右側小旋鈕 -->
+                                <path d="M64 100 L64 90 C64 88 70 88 70 90 L70 100 Z" fill="#333" />
+
+                                <!-- 左側 PTT 發話按鈕 (橘色) -->
+                                <rect x="18" y="140" width="6" height="25" rx="2" fill="#f97316" />
+                                <!-- 左側小按鍵 -->
+                                <rect x="18" y="125" width="4" height="10" rx="1" fill="#444" />
+                                <rect x="18" y="170" width="4" height="10" rx="1" fill="#444" />
+
+                                <!-- 機身背板 -->
+                                <rect x="20" y="100" width="64" height="140" rx="8" fill="#2a2a2a" />
+                                <!-- 機身邊緣導角 -->
+                                <path
+                                    d="M 22 108 L 22 232 Q 22 238 28 238 L 76 238 Q 82 238 82 232 L 82 108 Q 82 102 76 102 L 28 102 Q 22 102 22 108"
+                                    fill="#383838" />
+                                <!-- 機身內部核心 -->
+                                <rect x="25" y="105" width="54" height="130" rx="4" fill="#222" />
+
+                                <!-- 頂部螢幕/銘牌 -->
+                                <rect x="32" y="110" width="40" height="15" rx="3" fill="#1a1a1a" />
+
+                                <!-- 揚聲器柵欄區塊 -->
+                                <rect x="28" y="130" width="48" height="55" rx="4" fill="#2a2a2a" />
+                                <rect x="30" y="132" width="44" height="51" rx="2" fill="#1a1a1a" />
+                                <!-- 柵欄開孔 -->
+                                <rect x="34" y="136" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="144" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="152" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="160" width="36" height="4" rx="1" fill="#000" />
+                                <rect x="34" y="168" width="36" height="4" rx="1" fill="#000" />
+
+                                <!-- 底部電池槽 -->
+                                <rect x="28" y="190" width="48" height="40" rx="3" fill="#2a2a2a" />
+                                <rect x="30" y="192" width="44" height="36" rx="2" fill="#1a1a1a" />
+                                <path d="M 35 195 L 69 195 C 72 195 72 225 69 225 L 35 225 C 32 225 32 195 35 195"
+                                    fill="#222" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 緊急救援彈出視窗 (漫畫對話框風格) -->
+            <div id="retro-alert-dialog" class="comic-alert-dialog">
+                <!-- 救生圈裝飾圖示 -->
+                <svg class="lifesaver-badge" viewBox="0 0 100 100" width="80" height="80"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="42" fill="#ffffff" stroke="#000000" stroke-width="4" />
+                    <circle cx="50" cy="50" r="20" fill="transparent" stroke="#000000" stroke-width="4" />
+                    <!-- 橘色色帶 -->
+                    <path d="M 38 8 L 62 8 L 56 30 L 44 30 Z" fill="#ea580c" stroke="#000000" stroke-width="3" />
+                    <path d="M 38 92 L 62 92 L 56 70 L 44 70 Z" fill="#ea580c" stroke="#000000" stroke-width="3" />
+                    <path d="M 8 38 L 8 62 L 30 56 L 30 44 Z" fill="#ea580c" stroke="#000000" stroke-width="3" />
+                    <path d="M 92 38 L 92 62 L 70 56 L 70 44 Z" fill="#ea580c" stroke="#000000" stroke-width="3" />
+                </svg>
+
+                <!-- 內嵌救援畫面影片 (可以更換 src) -->
+                <div class="comic-alert-video-container">
+                    <video id="alert-video" src="出動救援.mp4" autoplay loop muted playsinline></video>
+                </div>
+                <h2 class="comic-alert-text" style="color: #dc2626;">發現溺水遊客！</h2>
+                <!-- 保留原本的 skip-pov-btn ID，讓 JS 邏輯繼續運作 -->
+                <button id="skip-pov-btn" class="comic-alert-btn">即刻前往救援</button>
+            </div>
+
+        </section>
+
+        <!-- 2. 遊戲介面 (移植自點擊小遊戲) -->
+        <section id="game-screen" class="screen game-layer">
+            <div class="ocean-background"></div>
+            <div id="start-ui" class="start-ui">
+                <div class="ui-content">
+                    <h1 class="start-title">危急時刻</h1>
+                    <p class="start-desc">有人溺水，即刻前往救援！<br>點擊以抵抗水流。</p>
+                    <button id="start-btn" class="start-btn">開始救援</button>
+                </div>
+            </div>
+            <div id="game-ui" class="game-ui hide">
+                <div class="ui-content">
+                    <h2 class="game-title">與海流搏鬥</h2>
+                    <p class="game-instruction">快速點擊游向目標！留意漂浮的浮標。</p>
+                    <div class="progress-container">
+                        <div id="progress-bar-wrap" class="progress-bar-wrap">
+                            <div id="progress-bar" class="progress-bar"></div>
+                        </div>
+                        <div class="progress-text"><span id="distance-text">0</span> / 100 <span>m</span></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button id="skip-btn" class="skip-btn">完成 / 跳過 ➡</button>
+                    </div>
+                </div>
+            </div>
+            <div id="surge-warning" class="surge-warning hide">
+                <h2>⚠️ 浪潮加劇</h2>
+            </div>
+            <div id="beach-layer" class="beach-layer"></div>
+            <div id="swimmer" class="swimmer intro-standby">
+                <svg viewBox="0 0 200 240" class="lifeguard-silhouette">
+                    <!-- 黑色繫繩 -->
+                    <path d="M 100 150 Q 125 165 155 185" fill="none" stroke="#222" stroke-width="2.5" />
+                    <!-- 魚雷浮標 (Rescue Tube) -->
+                    <g transform="translate(155, 185) rotate(-15)">
+                        <!-- 紅色波浪形浮標體 -->
+                        <path
+                            d="M -8 -20 L -8 -6 C -6 -4, -6 0, -8 2 L -8 16 C -6 18, -6 22, -8 24 L -8 36 A 8 8 0 0 0 8 36 L 8 24 C 6 22, 6 18, 8 16 L 8 2 C 6 0, 6 -4, 8 -6 L 8 -20 A 8 8 0 0 0 -8 -20 Z"
+                            fill="#e11d24" />
+                        <!-- 高光效果 -->
+                        <path d="M -6 -20 L -6 36" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.3" />
+                    </g>
+                    <g class="swim-leg-left" transform-origin="90 150">
+                        <path d="M 85 145 C 75 165, 78 200, 82 220 C 85 225, 92 225, 95 220 C 98 200, 95 165, 95 145 Z"
+                            fill="#e2a87a" />
+                    </g>
+                    <g class="swim-leg-right" transform-origin="110 150">
+                        <path
+                            d="M 115 145 C 125 165, 122 200, 118 220 C 115 225, 108 225, 105 220 C 102 200, 105 165, 105 145 Z"
+                            fill="#e2a87a" />
+                    </g>
+                    <g class="swim-arm-left" transform-origin="75 65">
+                        <path d="M 75 65 Q 40 60 30 25" fill="none" stroke="#e2a87a" stroke-width="15"
+                            stroke-linecap="round" />
+                    </g>
+                    <g class="swim-arm-right" transform-origin="125 65">
+                        <path d="M 125 65 Q 160 85 155 130" fill="none" stroke="#e2a87a" stroke-width="15"
+                            stroke-linecap="round" />
+                    </g>
+                    <g fill="#e2a87a">
+                        <ellipse cx="100" cy="32" rx="14" ry="16" />
+                        <ellipse cx="100" cy="29" rx="13.5" ry="14" fill="#09090b" />
+                        <path
+                            d="M 90 45 Q 100 42 110 45 C 130 45, 142 55, 138 75 C 135 95, 122 120, 115 135 L 85 135 C 78 120, 65 95, 62 75 C 58 55, 70 45, 90 45 Z" />
+                        <path d="M 100 48 L 100 130 M 78 65 C 88 80, 93 105, 94 125 M 122 65 C 112 80, 107 105, 106 125"
+                            stroke="#c08253" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6" />
+                    </g>
+                    <path d="M 85 135 L 115 135 Q 118 148 112 154 Q 105 160 100 160 Q 95 160 88 154 Q 82 148 85 135 Z"
+                        fill="#dc2626" />
+                </svg>
+                <div class="water-wake"></div>
+            </div>
+            <div id="lifesavers-container"></div>
+            <div id="click-effects"></div>
+            <div id="dive-splash-container"></div>
+        </section>
+
+        <!-- 3. 統計頁面 (圖表) -->
+        <section id="stats-screen" class="screen"
+            style="display: block; padding: 0; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%);">
+            <!-- 裝飾性光暈光暈層 -->
+            <div
+                style="position: absolute; inset: 0; background: radial-gradient(ellipse at 25% 35%, rgba(210,185,140,0.18) 0%, transparent 55%), radial-gradient(ellipse at 75% 70%, rgba(180,160,120,0.10) 0%, transparent 50%); pointer-events: none; z-index: 0;">
+            </div>
+            <!-- 第一頁：圖表 (滿版) -->
+            <div
+                style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; z-index: 1;">
+                <div class="content"
+                    style="max-width: 1100px; width: 100%; background: transparent; box-shadow: none; backdrop-filter: none;">
+                    <h2 style="color: #2d2a22; text-align: center; margin-bottom: 32px;">考照制度不符現實需求　開放水域安全存疑慮</h2>
+
+                    <div style="display: flex; align-items: center; gap: 60px; flex-wrap: wrap;">
+
+                        <!-- 左側圓餅圖 -->
+                        <div class="pie-chart-wrapper" style="flex-shrink: 0;">
+                            <svg id="pie-chart" viewBox="0 0 500 500">
+                                <circle cx="250" cy="250" r="230" fill="rgba(0,0,0,0.04)" stroke="rgba(0,0,0,0.08)"
+                                    stroke-width="1" />
+                                <g id="pie-slices"></g>
+                                <circle cx="250" cy="250" r="95" fill="#f7f2ea" /> <!-- 甜甜圈洞口，配合米色底色 -->
+                            </svg>
+                            <!-- 圖表中心提示 -->
+                            <div class="chart-center-info"
+                                style="display: flex; flex-direction: column; align-items: center;">
+                                <span class="center-title">總事故數</span>
+                                <span class="center-value">531<span class="center-unit"
+                                        style="font-size: 1.2rem; margin-left: 2px;">人</span></span>
+                            </div>
+                        </div>
+
+                        <!-- 右側文字區（可自由編輯） -->
+                        <div style="flex: 1; min-width: 260px; text-align: left;">
+                            <p style="color: #5a4f3c; font-size: 1rem; line-height: 1.9;">
+                                由於原先分為兩項的游泳池與開放水域救生檢定，過度限縮通過者的執業範圍，難以回應市場用人需求，再加上臺灣地貌多樣，溪、河、湖、海各具不同水域特性，開放水域檢定也難以發展出一套能全面適用各地情境的獨立測驗科目，因此體育署於2019年改制為兩證合一，期盼能擴大救生員從業的彈性。
+                            </p>
+                            <p style="color: #5a4f3c; font-size: 1rem; line-height: 1.9; margin-top: 1.2em;">
+                                根據內政部消防署統計，近一年內發生的531起水域案件中，游泳池溺水案件僅有11起，而溪流、海洋、湖潭等開放水域則為520起。政府卻將多數的訓練資源與法規重點，投放在意外率僅佔不到百分之二的泳池環境中；而面對佔比超過九成、死亡率極高的開放水域，卻僅要求最低限度的增能，不僅讓考照制度流於形式，更是與安全需求產生嚴重矛盾。
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 3.5. 選擇情境選單 (Split Screen) -->
+        <section id="menu-screen" class="screen" style="display: block; padding: 0;">
+            <!-- 兩個滿版選項 (Split Screen) -->
+            <div class="split-screen-menu">
+                <!-- 海邊情境影片按鈕 -->
+                <div class="split-pane nav-btn" data-target="pov-intro-screen">
+                    <video autoplay loop muted playsinline
+                        poster="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?q=80&w=600&auto=format&fit=crop">
+                        <source src="IMG_9445.mp4" type="video/mp4">
+                    </video>
+                    <div class="pane-overlay">
+                        <h2>海邊</h2>
+                    </div>
+                </div>
+
+                <!-- 溪流情境影片按鈕 -->
+                <div class="split-pane nav-btn" data-target="river-intro-screen">
+                    <video autoplay loop muted playsinline
+                        poster="https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?q=80&w=600&auto=format&fit=crop">
+                        <source src="溪邊游泳.mp4" type="video/mp4">
+                    </video>
+                    <div class="pane-overlay">
+                        <h2>溪邊</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 置中合併文字框 (疊於整個 Split Screen 正中央) -->
+            <div
+                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 20; pointer-events: none; text-align: center; max-width: 520px; width: 90%; padding: 28px 32px; background: rgba(0,0,0,0.55); backdrop-filter: blur(12px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.15);">
+                <p
+                    style="color: #f0ede8; font-size: 1.05rem; line-height: 1.85; margin: 0 0 0.8em 0; letter-spacing: 0.3px;">
+                    開放水域各自具有獨特條件，其中溪河與近海作為溺水事故率最高的場域，隱藏許多危險成因需要注意。
+                </p>
+                <p style="color: #d4cfc9; font-size: 0.95rem; margin: 0; letter-spacing: 0.5px;">
+                    點擊相應區域查看須知。
+                </p>
+            </div>
+        </section>
+
+
+        <!-- 5. 海邊情境 (Scrollytelling 數位敘事版) -->
+        <section id="beach-screen" class="screen">
+            <!-- 捲動式影片：earth -->
+            <style></style>
+            <div id="pfplm" style="width: 100%;">
+                <div id="9eca9284-1ab4-44f6-b135-da831b86e20e"></div>
+                <script>
+                    (function () {
+                        var namespace = '@story-telling-reporter/react-embed-code-generator@2.2.20';
+                        var pkg = 'scrollable-video';
+                        if (typeof window != 'undefined') {
+                            if (!window.hasOwnProperty(namespace)) {
+                                window[namespace] = {};
+                            }
+                            if (window[namespace] && !window[namespace].hasOwnProperty(pkg)) {
+                                window[namespace][pkg] = [];
+                            }
+                            if (Array.isArray(window[namespace][pkg])) {
+                                var embedEl = document.getElementById('9eca9284-1ab4-44f6-b135-da831b86e20e');
+                                var scrollerEl = embedEl && embedEl.closest('#beach-screen');
+                                var scrollerRef = scrollerEl ? { current: scrollerEl } : undefined;
+                                var data = { "video": { "src": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002Fearth-BHyMxo9VaG0n.mp4", "mobileSrc": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002Fearth-BHyMxo9VaG0n.mp4", "duration": 11.136 }, "captions": [{ "id": "mfnki", "width": "narrow", "alignment": "right", "startTime": 3.26, "rawContentState": { "blocks": [{ "key": "6mn8", "data": {}, "text": "拍岸流又稱沿岸流，波浪到達淺水區時，輪狀運動下部因與海底摩擦受阻，以致波浪升高、洶湧起伏不已。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 47, "offset": 0 }] }, { "key": "91mcg", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "5s97c", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "3qr0n", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "C:\\Users\\Stanley\\.gemini\\antigravity\\scratch\\lifeguard-project\\海邊危險左邊.mp4", "desc": "" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }, { "id": "pnkfn", "width": "narrow", "alignment": "left", "startTime": 7.72, "rawContentState": { "blocks": [{ "key": "b8tai", "data": {}, "text": "由於海浪是一股能量，打進海岸時，需要地方將海水宣洩、回到海洋中。再加上水往低處流的特性，海水會匯聚於地形較深的區域，並形成「離岸流」。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 67, "offset": 0 }] }], "entityMap": {} } }, { "id": "ehfhb", "width": "narrow", "alignment": "left", "startTime": 9.43, "rawContentState": { "blocks": [{ "key": "2mua2", "data": {}, "text": "垂直於海岸、向外海方向快速流動的強烈海流。流速極快，能將泳客迅速帶離海岸，是海灘戲水最常見且危險的溺水殺手，約佔海灘救援事件的八成。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 66, "offset": 0 }] }], "entityMap": {} } }], "darkMode": true, "secondsPer100vh": 1.5, "uuid": "9eca9284-1ab4-44f6-b135-da831b86e20e" };
+                                data.scrollerRef = scrollerRef;
+                                window[namespace][pkg].push(data);
+                            }
+                        }
+                    })()
+                </script>
+                <script type="text/javascript" defer crossorigin
+                    src="https://cdn.jsdelivr.net/npm/@story-telling-reporter/react-embed-code-generator@2.2.20/dist/scrollable-video.js"></script>
+            </div>
+        </section>
+
+        <!-- 5.1. 捲動式影片：實際救援 離岸流 -->
+        <section id="rip-current-video-screen" class="screen">
+            <!-- 捲動式影片嵌入 (直接全寬，不套任何包覆容器) -->
+            <div id="ijnnk" style="width: 100%;">
+                <div id="0b1ec0bb-c460-496c-8e35-a1550d481854"></div>
+                <script>
+                        (function () {
+                            var namespace = '@story-telling-reporter/react-embed-code-generator@2.2.20';
+                            var pkg = 'scrollable-video';
+                            if (typeof window != 'undefined') {
+                                if (!window.hasOwnProperty(namespace)) {
+                                    window[namespace] = {};
+                                }
+                                if (window[namespace] && !window[namespace].hasOwnProperty(pkg)) {
+                                    window[namespace][pkg] = [];
+                                }
+                                if (Array.isArray(window[namespace][pkg])) {
+                                    var embedEl = document.getElementById('0b1ec0bb-c460-496c-8e35-a1550d481854');
+                                    var scrollerEl = embedEl && embedEl.closest('#rip-current-video-screen');
+                                    var scrollerRef = scrollerEl ? { current: scrollerEl } : undefined;
+                                    var data = { "video": { "src": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002F-------------AAWYlvszZQ-u.mp4", "mobileSrc": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002F-------------AAWYlvszZQ-u.mp4", "duration": 15.915 }, "captions": [{ "id": "gpmln", "width": "wide", "alignment": "center", "startTime": 1.16, "rawContentState": { "blocks": [{ "key": "7v82v", "data": {}, "text": "在新北市石門區白沙灣的實際救援案例中，孩童不慎受離岸流影響，不斷往外海漂，值勤救生員趕緊出動。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "3b4il", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "djllr", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "derjg", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "C:\\Users\\Stanley\\.gemini\\antigravity\\scratch\\lifeguard-project\\離岸流標註.gif", "desc": "打向岸邊的白色浪花並不連續，中間出現幾乎沒有浪花的區域。同時波紋混亂，海水顏色與兩旁不同" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }, { "id": "oigck", "width": "narrow", "alignment": "left", "startTime": 9.53, "rawContentState": { "blocks": [{ "key": "6c1on", "data": {}, "text": "若實際遭遇離岸流，白沙灣資深救生員闕河聖提到能跟著海流漂，盡量往兩側的白浪靠近。待脫離海流後，再往岸邊游或讓海浪將人推向岸上.", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }, { "id": "mfdmo", "width": "narrow", "alignment": "left", "startTime": 13.77, "rawContentState": { "blocks": [{ "key": "1gloq", "data": {}, "text": "救生員成功將孩童帶上救援板，滑回岸上。同時為確保安全，總共派遣了兩位救生員前往。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }], "darkMode": true, "secondsPer100vh": 2, "uuid": "0b1ec0bb-c460-496c-8e35-a1550d481854" };
+                                    data.scrollerRef = scrollerRef;
+                                    window[namespace][pkg].push(data);
+                                }
+                            }
+                        })()
+                </script>
+                <script type="text/javascript" defer crossorigin
+                    src="https://cdn.jsdelivr.net/npm/@story-telling-reporter/react-embed-code-generator@2.2.20/dist/scrollable-video.js"></script>
+            </div>
+        </section>
+
+        <!-- 5.2. 入水方式前導文字頁 -->
+        <section id="entry-intro-screen" class="screen"
+            style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%); padding: 40px; color: #2d2a22; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;">
+
+
+            <div style="max-width: 680px; width: 100%; position: relative; z-index: 1;">
+                <div
+                    style="color: #000000; font-size: 1.15rem; line-height: 1.95; text-align: left; letter-spacing: 0.5px; font-family: 'Noto Sans TC', sans-serif;">
+                    <p style="margin-bottom: 1.5em;">
+                        綜觀上述內容，可見開放水域具備一定程度的危險，救生員若沒有相應水域的知識和救生經驗，不僅增加民眾從事水域活動的安全風險，更會讓自身陷於危險職場中。</p>
+                    <p style="margin-bottom: 1.5em;">
+                        然而，現行檢定規劃以游泳池環境為主，測驗內容分為體能需求和基礎急救能力。乍看之下面面俱到，但台灣游泳池事業協會秘書長劉家豪坦言，「我能確定目前臺灣訓練出來的救生員，沒有辦法直接在開放水域執業。」他進一步舉例，若救生員想在海水浴場等開放水域執業，還必須接受額外訓練如長距離體能耐力、操作救援無人機以及駕駛橡皮艇等專業技能，「這些項目要怎麼在泳池考？不可能啊！」以泳池為核心的檢定制度，雖能建立基礎救生能力，卻難以涵蓋海流、浪況、裝備操作與長距離救援等開放水域的真實情境，形成訓練內容與執業現場間的明顯落差。
+                    </p>
+                    <p style="font-weight: bold; margin-bottom: 0;">
+                        為補足此能力缺口，目前僅能仰賴民間協會舉辦開放水域訓練，訓練內容因協會而異。下舉中華海浪救生協會部分海訓為例：</p>
+                </div>
+            </div>
+
+            <!-- 底部提示文字 -->
+            <div
+                style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; pointer-events: none;">
+                <p style="font-size: 0.85rem; color: #8a7a62; margin-bottom: 10px; letter-spacing: 1px;">向下捲動觀看訓練課程</p>
+                <div class="arrow-down" style="color: #8a7a62; font-size: 1.2rem;">↓</div>
+            </div>
+        </section>
+
+        <!-- 5.5. 捲動式影片：入水方式 -->
+        <section id="scrollable-video-screen" class="screen">
+
+            <!-- 捲動式影片嵌入 (直接全寬，不套任何包覆容器) -->
+            <div id="lgbdc" style="width: 100%;">
+                <div id="0c6fd09f-6cfa-449f-b814-9de1731fd214"></div>
+                <script>
+                        (function () {
+                            var namespace = '@story-telling-reporter/react-embed-code-generator@2.2.20';
+                            var pkg = 'scrollable-video';
+                            if (typeof window != 'undefined') {
+                                if (!window.hasOwnProperty(namespace)) {
+                                    window[namespace] = {};
+                                }
+                                if (window[namespace] && !window[namespace].hasOwnProperty(pkg)) {
+                                    window[namespace][pkg] = [];
+                                }
+                                if (Array.isArray(window[namespace][pkg])) {
+                                    var embedEl = document.getElementById('0c6fd09f-6cfa-449f-b814-9de1731fd214');
+                                    var scrollerEl = embedEl && embedEl.closest('#scrollable-video-screen');
+                                    var scrollerRef = scrollerEl ? { current: scrollerEl } : undefined;
+                                    var data = { "video": { "src": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002F-----------------3--22Q1PlXUCysq.mp4", "mobileSrc": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002F-----------------3--22Q1PlXUCysq.mp4", "duration": 18.248 }, "captions": [{ "id": "nfnbn", "width": "narrow", "alignment": "left", "startTime": 1.22, "rawContentState": { "blocks": [{ "key": "76c3n", "data": {}, "text": "從岸邊要到浪區，有不同對應方式。因此為訓練救生員如何從值勤位置快速抵達救援點，課程內容之一為聽到哨聲，起身快速從沙灘跑向海中。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }, { "id": "cngmc", "width": "narrow", "alignment": "left", "startTime": 4.09, "rawContentState": { "blocks": [{ "key": "29oal", "data": {}, "text": "接觸到水後，轉換跑步姿勢為跨步式.同時視線觀察溺者位置與環境狀況，雙腳高抬腿，以腿高於水面的跑步方式。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }, { "id": "piedm", "width": "narrow", "alignment": "right", "startTime": 6.97, "rawContentState": { "blocks": [{ "key": "27r6q", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "8r8bg", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "acnj", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Fimages\u002F2b25a0a3-5a07-46ee-bbc3-00b47f70fa5c.gif", "desc": "學員跟著教練指示，碰到不同環境便採取相意的姿勢，以期能達到快速接近溺者的目的。" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }, { "id": "gigmg", "width": "narrow", "alignment": "left", "startTime": 9.47, "rawContentState": { "blocks": [{ "key": "3dr7e", "data": {}, "text": "不僅是入水，培訓也移動到距岸邊約200公尺遠，嘗試海中救援技巧。學員會身著黃色上衣與紅黃兼具的泳帽，則是因為強烈對比在水中十分明顯，能讓人一眼望見。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }, { "id": "ookkh", "width": "narrow", "alignment": "left", "startTime": 13.5, "rawContentState": { "blocks": [{ "key": "7cqdu", "data": {}, "text": "此訓練為借浪，以魚躍式潛入水中後，配合海浪速度借用其推力，保持身體成一直線，雙手在前，頭部抬起眼睛張開乘浪而回，節省寶貴的體力並免除碰撞障礙物發生危險。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "ejvi6", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "abcpa", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "75m7f", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "b7n2u", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Fimages\u002Fece088d4-c5ca-492c-b068-990879bdc0ad.gif", "desc": "先前訓練中，教練所示範的魚躍式入水動作" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }, { "id": "oaoim", "width": "narrow", "alignment": "left", "startTime": 16.55, "rawContentState": { "blocks": [{ "key": "dis7s", "data": {}, "text": "張中銘點出其中的技術，「加速太快，浪會打不到你，只能推進一下下。慢慢的浪就過去，你還是沒辦法一次就回到岸邊。」他補充如果成功，借一道浪的力就可能游回岸。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }], "darkMode": true, "secondsPer100vh": 1.5, "uuid": "0c6fd09f-6cfa-449f-b814-9de1731fd214" };
+                                    data.scrollerRef = scrollerRef;
+                                    window[namespace][pkg].push(data);
+                                }
+                            }
+                        })()
+                </script>
+                <script type="text/javascript" defer crossorigin
+                    src="https://cdn.jsdelivr.net/npm/@story-telling-reporter/react-embed-code-generator@2.2.20/dist/scrollable-video.js"></script>
+            </div>
+        </section>
+
+        <!-- 5.6. 捲動式影片：救援板 -->
+        <section id="rescue-board-video-screen" class="screen">
+            <!-- 捲動式影片嵌入 (直接全寬，不套任何包覆容器) -->
+            <div id="oodgl" style="width: 100%;">
+                <div id="6e65ccaf-e607-4f62-9f5f-83d68206eea3"></div>
+                <script>
+                        (function () {
+                            var namespace = '@story-telling-reporter/react-embed-code-generator@2.2.20';
+                            var pkg = 'scrollable-video';
+                            if (typeof window != 'undefined') {
+                                if (!window.hasOwnProperty(namespace)) {
+                                    window[namespace] = {};
+                                }
+                                if (window[namespace] && !window[namespace].hasOwnProperty(pkg)) {
+                                    window[namespace][pkg] = [];
+                                }
+                                if (Array.isArray(window[namespace][pkg])) {
+                                    var embedEl = document.getElementById('6e65ccaf-e607-4f62-9f5f-83d68206eea3');
+                                    var scrollerEl = embedEl && embedEl.closest('#rescue-board-video-screen');
+                                    var scrollerRef = scrollerEl ? { current: scrollerEl } : undefined;
+                                    var data = { "video": { "src": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002F---15-------HRSo3-FUxuvA.mp4", "mobileSrc": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002F---15-------HRSo3-FUxuvA.mp4", "duration": 17.012 }, "captions": [{ "id": "hgaid", "width": "wide", "alignment": "center", "startTime": 0.94, "rawContentState": { "blocks": [{ "key": "9e5jm", "data": {}, "text": "救援板為常見救援工具之一，相比於靈活的衝浪板，實際厚度約為十五公分，以能乘載救生員與被救者兩人重量且不能翻覆為主要作用，幫助救生員降低徒手的消耗同時更快抵達海中帶回無法回岸的人員。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }, { "id": "idlgn", "width": "narrow", "alignment": "right", "startTime": 5.61, "rawContentState": { "blocks": [{ "key": "34ioj", "data": {}, "text": "上板可分為跪姿與趴姿兩種類型。根據教練說明，跪姿上板可先在旁跳兩到三下有動力後，撐住板的兩側向上一躍即可上板。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }, { "id": "kdmdm", "width": "narrow", "alignment": "left", "startTime": 10.62, "rawContentState": { "blocks": [{ "key": "dt6fc", "data": {}, "text": "若為趴姿，則抓取板的兩側向板上趴，在水中也能從板後抓繩向前爬", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "10sk5", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "5vmtk", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Fimages\u002F99fa17f1-c9b1-4da7-8649-3155dd0eb8b9.gif", "desc": "" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }, { "id": "knmem", "width": "narrow", "alignment": "left", "startTime": 13.69, "rawContentState": { "blocks": [{ "key": "8ri30", "data": {}, "text": "以雙手往水中划便可向前，同時上半身盡量撐高讓前板翹起，能較有效越過浪。浪經過板的一半後，教練也建議能將後腳抬高去划水。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "3tlg", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "33de9", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "593b5", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "C:\\Users\\Stanley\\.gemini\\antigravity\\scratch\\lifeguard-project\\download (3) (1).gif", "desc": "" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }, { "id": "hcfbo", "width": "narrow", "alignment": "left", "startTime": 15.96, "rawContentState": { "blocks": [{ "key": "5mecn", "data": {}, "text": "值勤中的救生員便會利用救援板來巡視水域周邊民眾安全。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "dnhd8", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "4d5ru", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "C:\\Users\\Stanley\\.gemini\\antigravity\\scratch\\lifeguard-project\\download (2.1).gif", "desc": "" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }], "darkMode": true, "secondsPer100vh": 1.5, "uuid": "6e65ccaf-e607-4f62-9f5f-83d68206eea3" };
+                                    data.scrollerRef = scrollerRef;
+                                    window[namespace][pkg].push(data);
+                                }
+                            }
+                        })()
+                </script>
+                <script type="text/javascript" defer crossorigin
+                    src="https://cdn.jsdelivr.net/npm/@story-telling-reporter/react-embed-code-generator@2.2.20/dist/scrollable-video.js"></script>
+            </div>
+        </section>
+
+        <!-- 5.7. 捲動式影片：救生艇 -->
+        <section id="rescue-boat-video-screen" class="screen">
+            <!-- 捲動式影片嵌入 (直接全寬，不套任何包覆容器) -->
+            <div id="qcoog" style="width: 100%;">
+                <div id="6c0fb25f-a4c1-4275-b4b1-89cb13dca246"></div>
+                <script>
+                        (function () {
+                            var namespace = '@story-telling-reporter/react-embed-code-generator@2.2.20';
+                            var pkg = 'scrollable-video';
+                            if (typeof window != 'undefined') {
+                                if (!window.hasOwnProperty(namespace)) {
+                                    window[namespace] = {};
+                                }
+                                if (window[namespace] && !window[namespace].hasOwnProperty(pkg)) {
+                                    window[namespace][pkg] = [];
+                                }
+                                if (Array.isArray(window[namespace][pkg])) {
+                                    var embedEl = document.getElementById('6c0fb25f-a4c1-4275-b4b1-89cb13dca246');
+                                    var scrollerEl = embedEl && embedEl.closest('#rescue-boat-video-screen');
+                                    var scrollerRef = scrollerEl ? { current: scrollerEl } : undefined;
+                                    var data = { "video": { "src": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002F-----------------1--fXX_D4bOmOnJ.mp4", "mobileSrc": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Ffiles\u002F-----------------1--fXX_D4bOmOnJ.mp4", "duration": 8.321 }, "captions": [{ "id": "qkhhn", "width": "wide", "alignment": "center", "startTime": 0.5, "rawContentState": { "blocks": [{ "key": "702bg", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "f9fet", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "1cqlt", "data": {}, "text": "救生艇（Inflatable Rescue Boat），用途廣泛能在河川、溪流及近海執行救援任務。船艇上需搭載兩位人員，一位駕駛，另一位負責指引方向。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Fimages\u002F4fea4e31-954b-4967-ab82-0b19683fdf64.png", "desc": "" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }, { "id": "ifcld", "width": "narrow", "alignment": "left", "startTime": 2.58, "rawContentState": { "blocks": [{ "key": "cflrd", "data": {}, "text": "由於行駛時，船頭會微微翹起，因此後方駕駛無法清楚前方狀況，會交由前方的救生員採取趴姿壓在船頭，指引溺者方向，雙人配合直到發現溺者。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }, { "id": "diekg", "width": "narrow", "alignment": "left", "startTime": 4.5, "rawContentState": { "blocks": [{ "key": "2kfbg", "data": {}, "text": "若遭遇救援艇無法深入的地方，仍需依靠前方救生員把溺者帶上船，迅速查看呼吸心跳後，判斷先在船上做CPR亦或沒有非常遙遠，則可盡速回岸做急救。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": {} } }, { "id": "khkfc", "width": "narrow", "alignment": "left", "startTime": 6.47, "rawContentState": { "blocks": [{ "key": "ev6tl", "data": {}, "text": "實際情況駕駛員需額外訓練引擎操作，救生員訓練會以前方為主軸，教導船艇的合作救援與正確的方向引導。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "69gt6", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "6ddpk", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "5su1q", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "https:\u002F\u002Flab-storytelling-storage.twreporter.org\u002Fimages\u002F063864b2-7486-4b2e-8f20-3d419dd43743.png", "desc": "船體底部卡榫供承載人員維持平衡，降低風險。" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }], "darkMode": true, "secondsPer100vh": 1.5, "uuid": "6c0fb25f-a4c1-4275-b4b1-89cb13dca246" };
+                                    data.scrollerRef = scrollerRef;
+                                    window[namespace][pkg].push(data);
+                                }
+                            }
+                        })()
+                </script>
+                <script type="text/javascript" defer crossorigin
+                    src="https://cdn.jsdelivr.net/npm/@story-telling-reporter/react-embed-code-generator@2.2.20/dist/scrollable-video.js"></script>
+            </div>
+        </section>
+
+        <!-- 5.8. 救生訓練總結說明頁 -->
+        <section id="training-outro-screen" class="screen"
+            style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%); padding: 40px; color: #2d2a22; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;">
+            <style>
+                #training-outro-screen .outro-text-container p {
+                    margin-bottom: 1.2em;
+                }
+
+                #training-outro-screen .outro-text-container p:last-child {
+                    margin-bottom: 0;
+                }
+
+                @media (max-width: 768px) {
+                    #training-outro-screen {
+                        padding: 24px !important;
+                    }
+
+                    #training-outro-screen .outro-header-tag {
+                        margin-bottom: 10px !important;
+                    }
+
+                    #training-outro-screen h2 {
+                        font-size: 1.8rem !important;
+                        margin-bottom: 16px !important;
+                    }
+
+                    #training-outro-screen .divider-line {
+                        margin-bottom: 20px !important;
+                    }
+
+                    #training-outro-screen .outro-text-container {
+                        font-size: 0.95rem !important;
+                        line-height: 1.75 !important;
+                    }
+
+                    #training-outro-screen .outro-text-container p {
+                        margin-bottom: 1em;
+                    }
+
+                    #training-outro-screen-btn {
+                        padding: 10px 24px !important;
+                        font-size: 0.95rem !important;
+                    }
+                }
+            </style>
+
+            <div style="max-width: 680px; width: 100%; position: relative; z-index: 1;">
+                <div class="outro-text-container"
+                    style="color: #000000; font-size: 1.15rem; line-height: 1.95; text-align: left; letter-spacing: 0.5px; margin-bottom: 1.5em; font-family: 'Noto Sans TC', sans-serif;">
+                    <p>
+                        「像秀姑巒溪的激流，就需要去學橡皮艇操作方法，要因地制宜。」台灣游泳池事業協會理事長范清樂說明，每地的潮汐、海流、風浪強度與地形結構都會影響救援方式，所需專業訓練也不同。政府端難在標準化制度下發展出適宜各地水域特性的培訓內容，因此將培訓責任間接轉嫁到開放水域業者身上，由業者自行安排增能課程。
+                    </p>
+                    <p>
+                        然而，中華民國水上救生協會考試官兼國際組長許金德點出，有些民間訓練班是為檢定而設立，「（協會）隨便上課而且時數都很短，就只針對考試的項目上，不會上得很完整。」中華民國水適能訓練協會理事長江柏億也補充，當檢定考試缺乏開放水域項目
+                        ，以通過考試為主要目的學員自然也不會想花錢進行開放水域培訓，「訓練是制度需要，但當你這個（開放水域）的證照供應都沒有，我怎麼可能會有額外培訓的需求？」
+                    </p>
+                    <p>
+                        除了民間訓練內容的減少與更動外，訓練品質更存在良莠不齊的疑慮。曾擔任公辦檢定甄審人員的林智明，一看考生的動作就能分辨其出自哪個協會，「很多協會教的不是體育署考試的動作，他們還會融合一些自己覺得對的動作。」他認為真正需要改革的是訓練班的教學方式，統一且標準的訓練才能提升考生的游泳和救生能力。
+                    </p>
+                </div>
+
+                <div style="margin-top: 32px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                    <button class="nav-btn secondary" data-target="menu-screen"
+                        style="background-color: transparent; color: #8a7a62; border: 2px solid #8a7a62; padding: 12px 28px; border-radius: 30px; font-size: 1.05rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-family: 'Noto Sans TC', sans-serif;">
+                        <span>前往情境選單</span>
+                        <span style="font-size: 1.1rem; line-height: 1;">⇄</span>
+                    </button>
+                    <button class="nav-btn primary" data-target="training-outro-screen-2"
+                        style="background-color: #8a7a62; color: #fdfbf8; border: none; box-shadow: 0 4px 15px rgba(138, 122, 98, 0.3); padding: 12px 28px; border-radius: 30px; font-size: 1.05rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-family: 'Noto Sans TC', sans-serif;">
+                        <span>繼續向下閱讀</span>
+                        <span style="font-size: 1.1rem; line-height: 1;">↓</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5.8.b 救生訓練總結說明頁二 -->
+        <section id="training-outro-screen-2" class="screen"
+            style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%); padding: 40px; color: #2d2a22; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;">
+            <style>
+                #training-outro-screen-2 .outro-text-container p {
+                    margin-bottom: 1.2em;
+                }
+
+                #training-outro-screen-2 .outro-text-container p:last-child {
+                    margin-bottom: 0;
+                }
+
+                #training-outro-screen-2 .two-col-container {
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    max-width: 1100px;
+                    gap: 40px;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    z-index: 1;
+                    padding: 0 20px;
+                }
+
+                #training-outro-screen-2 .left-col {
+                    flex: 1.2;
+                    text-align: left;
+                }
+
+                #training-outro-screen-2 .right-col {
+                    flex: 1;
+                    min-width: 300px;
+                    width: 100%;
+                }
+
+                @media (max-width: 900px) {
+                    #training-outro-screen-2 .two-col-container {
+                        flex-direction: column;
+                        max-height: 85vh;
+                        overflow-y: auto;
+                        gap: 24px;
+                        padding-top: 40px;
+                    }
+                    
+                    #training-outro-screen-2 .left-col {
+                        flex: none;
+                        width: 100%;
+                    }
+
+                    #training-outro-screen-2 .right-col {
+                        flex: none;
+                        width: 100%;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    #training-outro-screen-2 {
+                        padding: 24px !important;
+                    }
+
+                    #training-outro-screen-2 h2 {
+                        font-size: 1.5rem !important;
+                        margin-bottom: 16px !important;
+                    }
+
+                    #training-outro-screen-2 .divider-line {
+                        margin-bottom: 20px !important;
+                    }
+
+                    #training-outro-screen-2 .outro-text-container {
+                        font-size: 0.95rem !important;
+                        line-height: 1.75 !important;
+                    }
+
+                    #training-outro-screen-2 .outro-text-container p {
+                        margin-bottom: 1em;
+                    }
+                }
+            </style>
+
+            <div class="two-col-container">
+                <div class="left-col">
+                    <h2
+                        style="font-size: 2.2rem; color: #2d2a22; margin-bottom: 24px; font-weight: 700; letter-spacing: 1px; font-family: 'Noto Serif TC', serif;">
+                        公辦檢定本末倒置　通過率遞減致人力斷層</h2>
+                    <div class="divider-line"
+                        style="width: 40px; height: 3px; background: #8a7a62; margin: 0 0 32px 0; border-radius: 2px;">
+                    </div>
+
+                    <div class="outro-text-container"
+                        style="color: #000000; font-size: 1.15rem; line-height: 1.95; text-align: left; letter-spacing: 0.5px; margin-bottom: 1.5em; font-family: 'Noto Sans TC', sans-serif;">
+                        <p>
+                            「就是這個以外，再加入未來的人力，像是義務役，我會想那這麼多兵，以學生的角度看，只會覺得，在這個太多人、那人很多，這跟我也沒關係。可是如果學生也想跟著人跑，就想加入。」黃國倫（清華大學體育室助理教授、中華水救理事）指出，可以加入學生或是義務役作為輔助維安人力，提升整體防溺網絡。
+                        </p>
+                        <p>
+                            除了傳統人力的配置，科技輔助救援也是未來的重要方向。透過無人機巡邏、AI 影像辨識系統監控水域異常，能更快速地在第一時間發現溺水徵兆，並即時通報救生人員，降低救援時間與人力的損耗。
+                        </p>
+                        <p>
+                            藉由結合社區、學校與科技的多方資源，未來的防溺工作將不再只依賴單一體制，而是能建立更全面、即時的防護網，確保開放水域的安全。
+                        </p>
+                    </div>
+                </div>
+                <div class="right-col">
+                    <div class="flourish-embed flourish-draw" data-src="visualisation/28728743"><script src="https://public.flourish.studio/resources/embed.js"></script><noscript><img src="https://public.flourish.studio/visualisation/28728743/thumbnail" width="100%" alt="draw visualization" /></noscript></div>
+                </div>
+            </div>
+
+            <!-- 底部提示文字 -->
+            <div
+                style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; pointer-events: none;">
+                <p style="font-size: 0.85rem; color: #8a7a62; margin-bottom: 10px; letter-spacing: 1px;">向下捲動繼續前進</p>
+                <div class="arrow-down" style="color: #8a7a62; font-size: 1.2rem;">↓</div>
+            </div>
+        </section>
+
+        <!-- 5.8.c 救生訓練總結說明頁三 -->
+        <section id="training-outro-screen-3" class="screen"
+            style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%); padding: 40px; color: #2d2a22; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;">
+            <style>
+                #training-outro-screen-3 .outro-text-container p {
+                    margin-bottom: 1.2em;
+                }
+
+                #training-outro-screen-3 .outro-text-container p:last-child {
+                    margin-bottom: 0;
+                }
+
+                #training-outro-screen-3 .two-col-container {
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    max-width: 1100px;
+                    gap: 40px;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    z-index: 1;
+                    padding: 0 20px;
+                }
+
+                #training-outro-screen-3 .left-col {
+                    flex: 1;
+                    min-width: 300px;
+                    width: 100%;
+                }
+
+                #training-outro-screen-3 .right-col {
+                    flex: 1.2;
+                    text-align: left;
+                }
+
+                @media (max-width: 900px) {
+                    #training-outro-screen-3 .two-col-container {
+                        flex-direction: column;
+                        max-height: 85vh;
+                        overflow-y: auto;
+                        gap: 24px;
+                        padding-top: 40px;
+                    }
+                    
+                    #training-outro-screen-3 .left-col {
+                        flex: none;
+                        width: 100%;
+                    }
+
+                    #training-outro-screen-3 .right-col {
+                        flex: none;
+                        width: 100%;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    #training-outro-screen-3 {
+                        padding: 24px !important;
+                    }
+
+                    #training-outro-screen-3 h2 {
+                        font-size: 1.8rem !important;
+                        margin-bottom: 16px !important;
+                    }
+
+                    #training-outro-screen-3 .divider-line {
+                        margin-bottom: 20px !important;
+                    }
+
+                    #training-outro-screen-3 .outro-text-container {
+                        font-size: 0.95rem !important;
+                        line-height: 1.75 !important;
+                    }
+
+                    #training-outro-screen-3 .outro-text-container p {
+                        margin-bottom: 1em;
+                    }
+                }
+            </style>
+
+            <div style="width: 100%; position: relative; z-index: 1;">
+                <div class="two-col-container">
+                    <div class="left-col">
+                        <img src="泳池培訓.jpg" alt="泳池培訓" style="width: 100%; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: block; margin: 0 auto;" />
+                        <div style="font-size: 0.85rem; color: #555555; line-height: 1.6; margin-top: 12px; font-family: 'Noto Sans TC', sans-serif; text-align: left; letter-spacing: 0.5px;">
+                            長背板救援訓練使用假人模擬，有可能使通過檢定者仍難以想像實際救援情況。
+                            <span style="color: #888888; margin-left: 8px;">圖／中華民國水適能訓練協會提供</span>
+                        </div>
+                    </div>
+                    <div class="right-col">
+                        <div class="outro-text-container"
+                            style="color: #000000; font-size: 1.15rem; line-height: 1.95; text-align: left; letter-spacing: 0.5px; margin-bottom: 0; font-family: 'Noto Sans TC', sans-serif;">
+                            <p>
+                                根據監察院2024年公布的調查報告顯示，救生員檢定自公辦化後，相關檢定預算大幅攀升；然而，合格人數卻呈現明顯下滑。在2018年以前，我國合格救生員人數每年約三千至四千人；自2019年修法後，每年僅剩下不到一千人合格。合格人數的斷崖式下跌，反映出救生員培育量能明顯萎縮，也使全國各地游泳池及開放水域面臨救生人力嚴重短缺的困境，第一線水域安全維護壓力隨之升高。
+                            </p>
+                            <p>
+                                曾任考官的許金德指出，「考試的考官抓得很嚴格，一點點的小動作錯誤就會被扣分，其實跟真正救人無關。」范清樂也持相同看法，他舉例現今泳池環境已不同以往，多數場館水深僅約150公分，池長以25公尺或50公尺為主，與早期深水、長距離的救援場景存在明顯差異，「對角處有人溺水時，考官卻還要求應試者不能直接跑過去，要用游的，是違背直覺的做法。」他補充，如長背板救援項目屬團隊協作項目，需三個人齊心協力配合完成，「但大家互不熟識、缺乏默契，很難一次成功。」而該項目只要任一環節未達標準，便會一次扣除32分，幾乎等同直接宣判檢定不合格。長此以往，考生平均通過率僅有四成。
+                            </p>
+                            <p>
+                                反觀國外的救生員考試內容，不僅與實際執勤狀況貼合，有些國家更建立證照分級制度，依等級決定執業範圍，讓開放水域救生人才專業化。接著，我們來比較臺灣與德國、美國、澳洲三國的救生員檢定內容差異：
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部提示文字 -->
+            <div
+                style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; pointer-events: none;">
+                <p style="font-size: 0.85rem; color: #8a7a62; margin-bottom: 10px; letter-spacing: 1px;">向下捲動進入各國制度比較</p>
+                <div class="arrow-down" style="color: #8a7a62; font-size: 1.2rem;">↓</div>
+            </div>
+        </section>
+
+        <!-- 5.9. 溪流情境前導文字頁 -->
+        <section id="river-intro-screen" class="screen"
+            style="display: flex; flex-direction: row; padding: 0; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%); overflow: hidden; align-items: stretch; justify-content: stretch;">
+            <style>
+                #river-intro-screen {
+                    display: flex;
+                    flex-direction: row;
+                }
+
+                .river-intro-video-half {
+                    flex: 1.2;
+                    height: 100%;
+                    position: relative;
+                    background: #000;
+                    overflow: hidden;
+                    clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+                }
+
+                .river-intro-text-half {
+                    flex: 1;
+                    height: 100%;
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 60px 40px 60px 0px;
+                    margin-left: -5%;
+                    z-index: 1;
+                }
+
+                @media (max-width: 768px) {
+                    #river-intro-screen {
+                        flex-direction: column !important;
+                    }
+
+                    .river-intro-video-half {
+                        height: 45vh !important;
+                        flex: none !important;
+                        width: 100% !important;
+                        clip-path: none !important;
+                    }
+
+                    .river-intro-text-half {
+                        height: 55vh !important;
+                        flex: none !important;
+                        width: 100% !important;
+                        padding: 30px 20px 80px 20px !important;
+                    }
+                }
+            </style>
+
+            <!-- 左側滿版影片 -->
+            <div class="river-intro-video-half">
+                <video autoplay loop muted playsinline
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                    <source src="溪邊游泳.mp4" type="video/mp4">
+                </video>
+            </div>
+
+            <!-- 右側文字區 -->
+            <div class="river-intro-text-half">
+                <!-- 裝飾性光暈層 -->
+                <div
+                    style="position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(210,185,140,0.15) 0%, transparent 65%); pointer-events: none; z-index: 0;">
+                </div>
+
+                <div style="max-width: 540px; width: 100%; position: relative; z-index: 1; text-align: left;">
+                    <p
+                        style="color: #5a4f3c; font-size: 1.15rem; line-height: 1.95; margin-bottom: 1.5em; letter-spacing: 0.5px;">
+                        看似清涼消暑的溪流，實則隱藏著漩渦、翻滾流、深潭與水溫急遽變化等致命危機。臺灣的溪河水域地形多變，在無人看管的開放水域中，民眾往往因低估水域的危險性而發生意外。
+                    </p>
+                    <p
+                        style="color: #2d2a22; font-size: 1.15rem; line-height: 1.95; font-weight: bold; letter-spacing: 0.5px; margin-bottom: 0;">
+                        接下來，我們將直擊溪流現場與防溺宣導需要注意的關鍵狀況：
+                    </p>
+                </div>
+
+                <!-- 底部提示文字 (絕對定位於最底部) -->
+                <div
+                    style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2; text-align: center; pointer-events: none;">
+                    <p style="font-size: 0.9rem; color: #8a7a62; margin-bottom: 10px;">向下捲動進入溪流現場</p>
+                    <div class="arrow-down" style="color: #8a7a62;">↓</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5.10. 溪流情境：雙通道圖文介紹 -->
+        <!-- 5.10. 溪流情境：雙通道圖文介紹 -->
+        <!-- 5.10. 溪流情境：文字介紹頁 -->
+        <section id="river-dual-channel-screen" class="screen" style="background-color: #000;">
+            <!-- 橫著滾吧！：溪邊危險區域 -->
+            <style>
+                #river-dual-channel-screen {
+                    text-align: left !important;
+                }
+
+                /* 給報導者文章頁使用 */
+                /* 將元件往上移動，使其與上一個區塊連接在一起。*/
+                /* 刪除下方註解即可使用。 */
+                /*
+              .storytelling-react-scrollable-image-container {
+                margin-top: -40px;
+              }
+              */
+
+                /* 給報導者文章頁使用 */
+                /* 將元件向左移動，撐滿文章頁 */
+                /* 刪除下方註解即可使用。 */
+                /*
+              @media (max-width: 767px) {
+                .storytelling-react-scrollable-image-container {
+                  margin-left: -3.4vw;
+                }
+              }
+
+              @media (min-width: 768px) and (max-width: 1023px) {
+                .storytelling-react-scrollable-image-container {
+                  margin-left: calc((100vw - 512px)/2 * -1);
+                }
+              }
+
+              @media (min-width: 1024px) and (max-width: 1439px) {
+                .storytelling-react-scrollable-image-container {
+                  margin-left: calc((100vw - 550px)/2 * -1);
+                }
+              }
+
+              @media (min-width: 1440px) {
+                .storytelling-react-scrollable-image-container {
+                  margin-left: calc((100vw - 730px)/2 * -1);
+                }
+              }
+              */
+
+                /* 給少年報導者文章頁使用 */
+                /* 將元件向左移動，撐滿文章頁 */
+                /* 刪除下方註解即可使用。 */
+                /*
+              @media (max-width: 767px) {
+                .storytelling-react-scrollable-image-container {
+                  margin-left: -5vw;
+                }
+              }
+
+              @media (min-width: 768px) {
+                .storytelling-react-scrollable-image-container {
+                  margin-left: calc((100vw - 700px)/2 * -1);
+                }
+              }
+              */
+            </style>
+
+            <div id="d190703d-4278-43e6-b308-8d69288792c8"></div>
+            <script>
+                    (function () {
+                        var namespace = '@story-telling-reporter/react-embed-code-generator@2.2.20';
+                        var pkg = 'scrollable-image';
+                        if (typeof window != 'undefined') {
+                            if (!window.hasOwnProperty(namespace)) {
+                                window[namespace] = {};
+                            }
+                            if (window[namespace] && !window[namespace].hasOwnProperty(pkg)) {
+                                window[namespace][pkg] = [];
+                            }
+                            if (Array.isArray(window[namespace][pkg])) {
+                                var embedEl = document.getElementById('d190703d-4278-43e6-b308-8d69288792c8');
+                                var scrollerEl = embedEl && embedEl.closest('#river-dual-channel-screen');
+                                var scrollerRef = scrollerEl ? { current: scrollerEl } : undefined;
+                                var data = { "className": "storytelling-react-scrollable-image-container", "imgObjs": [{ "url": "https:\u002F\u002Fi.meee.com.tw\u002FCngC6WJ.jpg" }, { "url": "https:\u002F\u002Fi.meee.com.tw\u002FUOa8F9a.jpg" }, { "url": "https:\u002F\u002Fi.meee.com.tw\u002FONC4Q5U.png" }, { "url": "https:\u002F\u002Fi.meee.com.tw\u002FGIdT4ZD.jpg" }, { "url": "https:\u002F\u002Fi.meee.com.tw\u002Fk8R5m0C.jpg" }, { "url": "https:\u002F\u002Fi.meee.com.tw\u002F9wceBBA.jpg" }, { "url": "https:\u002F\u002Fi.meee.com.tw\u002FvSd5GiU.jpg" }], "captions": [{ "width": "4.84%", "height": "29.470000000000002%", "position": { "top": "6.140000000000001%", "left": "0.91%" }, "rawContentState": { "blocks": [{ "key": "c6778", "data": {}, "text": "極端氣候", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 4, "offset": 0 }, { "style": "ITALIC", "length": 4, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 4, "offset": 0 }] }, { "key": "edgq2", "data": {}, "text": "在颱風、豪雨或土石流等極端氣候現象發生後，溪流地形容易產生改變，如堰塞湖積累大量土石與崩落物堵塞河道使水流路徑改變；一旦堰塞體因持續降雨、滲流或水位升高潰決，短時間內便可能釋放龐大水量，形成洪峰與土石流，進而對下游安全產生重大衝擊。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 116, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 116, "offset": 0 }] }], "entityMap": {} } }, { "width": "5.6899999999999995%", "height": "21.58%", "position": { "top": "72.46000000000001%", "left": "14.09%" }, "rawContentState": { "blocks": [{ "key": "4jur0", "data": {}, "text": "人工設施", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 4, "offset": 0 }, { "style": "ITALIC", "length": 4, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 4, "offset": 0 }] }, { "key": "8dvg1", "data": {}, "text": "攔沙壩、魚礁、灌溉設施與鋼筋水泥等人工設施，會破壞溪流既有的動態平衡，當溪水從寬闊水域流經人工設施間的狹隙更會形成「水洞」，因阻力而生的螺旋狀漩渦將瞬間形成巨大吸力，使戲水者面臨極高的溺水風險。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 97, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 97, "offset": 0 }] }], "entityMap": {} } }, { "width": "5.65%", "height": "25.09%", "position": { "top": "2.98%", "left": "36.71%" }, "rawContentState": { "blocks": [{ "key": "6gqrj", "data": {}, "text": "溪床落差／翻滾流", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 8, "offset": 0 }, { "style": "ITALIC", "length": 8, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 8, "offset": 0 }] }, { "key": "oljd", "data": {}, "text": "如果從堰壩、橫向水泥牆等上方流下的高速水流衝到下方較深且流速慢的水域時，兩股流速不同的水層將產生劇烈碰撞，上層水以高速往前沖、下層水則因阻力變大而被迫向後向上翻滾，形成持續翻騰的「滾輪流」，翻滾的同時又會被上方來的強力水流往下壓。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 115, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 115, "offset": 0 }] }], "entityMap": {} } }, { "width": "4.46%", "height": "36.49%", "position": { "top": "54.04%", "left": "44.82%" }, "rawContentState": { "blocks": [{ "key": "2pgdf", "data": {}, "text": "微笑流  ", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 5, "offset": 0 }, { "style": "ITALIC", "length": 5, "offset": 0 }, { "style": "BACKGROUND_COLOR_#9c784d", "length": 5, "offset": 0 }] }, { "key": "9jm1k", "data": {}, "text": "地形改變也容易造成水流變化。當水流撞擊河道中的障礙物時，由於地形影響，水流會從中央流向兩側，形成「微笑流」，戲水者可能會被流出該區域，也可能會被吸附在障礙物上。 ", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 81, "offset": 0 }, { "style": "BACKGROUND_COLOR_#9c784d", "length": 81, "offset": 0 }] }], "entityMap": {} } }, { "width": "5.6899999999999995%", "height": "38.25%", "position": { "top": "12.280000000000001%", "left": "62.09%" }, "rawContentState": { "blocks": [{ "key": "vrnn", "data": {}, "text": "激流區", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 3, "offset": 0 }, { "style": "BACKGROUND_COLOR_#9c784d", "length": 3, "offset": 0 }, { "style": "ITALIC", "length": 3, "offset": 0 }] }, { "key": "eieo9", "data": {}, "text": "位於溪床落差大、河道狹窄或岩石密集的位置，水流速度快、力量強，表面常出現白色浪花。人在其中幾乎無法站穩，一旦跌倒，身體很容易被沖撞到石塊，甚至捲入翻滾流、白水區或卡在障礙物中。就算是游泳好手，也別想力拼游上岸。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 105, "offset": 0 }, { "style": "BACKGROUND_COLOR_#9c784d", "length": 105, "offset": 0 }] }], "entityMap": {} } }, { "width": "3.6999999999999997%", "height": "50.349999999999994%", "position": { "top": "6.84%", "left": "44.84%" }, "rawContentState": { "blocks": [{ "key": "7qj5b", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "4jos0", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "aor1n", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "https:\u002F\u002Fi.meee.com.tw\u002FltIrnta.gif", "desc": "" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }, { "width": "5.42%", "height": "13.33%", "position": { "top": "23.16%", "left": "78.95%" }, "rawContentState": { "blocks": [{ "key": "44eul", "data": {}, "text": "緩流區", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "ITALIC", "length": 3, "offset": 0 }, { "style": "BOLD", "length": 3, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 3, "offset": 0 }] }, { "key": "cgr68", "data": {}, "text": "流速稍慢，水面看似平穩。但水流依舊能讓人站不穩。水深仍可能突然增加，腳下可能佈滿濕滑青苔或暗坑，一旦失去平衡還是有機率被帶往下游。看似平靜的水面下方也會存在看不見的水流，危險程度比想像中高。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 95, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 95, "offset": 0 }] }], "entityMap": {} } }, { "width": "4.84%", "height": "38.07%", "position": { "top": "7.89%", "left": "94.15%" }, "rawContentState": { "blocks": [{ "key": "4l9jk", "data": {}, "text": "隱藏危險", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 4, "offset": 0 }, { "style": "ITALIC", "length": 4, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 4, "offset": 0 }] }, { "key": "d0n68", "data": {}, "text": "浪花愈多水流愈湍急，代表地形崎嶇。即使水流表面平靜，也不代表水流不快。畫面中的魚仍在抵抗急流。光線昏暗、水體混濁等因素影響下，使人摸不清水中地形，此時貿量下水，很可能遇上漩渦、溪床驟降、石頭狹縫等危險。", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [{ "style": "BOLD", "length": 101, "offset": 0 }, { "style": "BACKGROUND_COLOR_#C0966266", "length": 101, "offset": 0 }] }], "entityMap": {} } }, { "width": "4.859999999999999%", "height": "20.7%", "position": { "top": "36.32%", "left": "94.15%" }, "rawContentState": { "blocks": [{ "key": "bku6r", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }, { "key": "7i7pn", "data": {}, "text": " ", "type": "atomic", "depth": 0, "entityRanges": [{ "key": 0, "length": 1, "offset": 0 }], "inlineStyleRanges": [] }, { "key": "642vd", "data": {}, "text": "", "type": "unstyled", "depth": 0, "entityRanges": [], "inlineStyleRanges": [] }], "entityMap": { "0": { "data": { "url": "https:\u002F\u002Fi.meee.com.tw\u002FAdj8cYQ.gif", "desc": "" }, "type": "IMAGE_LINK", "mutability": "IMMUTABLE" } } } }], "darkMode": true, "minHeight": undefined, "maxHeight": undefined, "uuid": "d190703d-4278-43e6-b308-8d69288792c8" };
+                                data.scrollerRef = scrollerRef;
+                                window[namespace][pkg].push(data);
+                            }
+                        }
+                    })()
+            </script>
+            <script type="text/javascript" defer crossorigin
+                src="https://cdn.jsdelivr.net/npm/@story-telling-reporter/react-embed-code-generator@2.2.20/dist/scrollable-image.js"></script>
+        </section>
+
+        <!-- 5.10.b 溪流情境：文字詳細說明頁 -->
+        <section id="river-text-screen" class="screen"
+            style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%); padding: 40px; color: #2d2a22; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;">
+            <style>
+                #river-text-screen .outro-text-container p {
+                    margin-bottom: 1.2em;
+                }
+
+                #river-text-screen .outro-text-container p:last-child {
+                    margin-bottom: 0;
+                }
+
+                @media (max-width: 768px) {
+                    #river-text-screen {
+                        padding: 24px !important;
+                    }
+
+                    #river-text-screen .river-header-tag {
+                        margin-bottom: 10px !important;
+                    }
+
+                    #river-text-screen h2 {
+                        font-size: 1.8rem !important;
+                        margin-bottom: 16px !important;
+                    }
+
+                    #river-text-screen .divider-line {
+                        margin-bottom: 20px !important;
+                    }
+
+                    #river-text-screen .outro-text-container {
+                        font-size: 0.95rem !important;
+                        line-height: 1.75 !important;
+                    }
+
+                    #river-text-screen .outro-text-container p {
+                        margin-bottom: 1em;
+                    }
+
+                    .river-text-btn {
+                        padding: 10px 24px !important;
+                        font-size: 0.95rem !important;
+                    }
+                }
+            </style>
+
+            <!-- 裝飾性光暈層 -->
+            <div
+                style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(210, 185, 140, 0.15) 0%, transparent 65%); pointer-events: none; z-index: 0;">
+            </div>
+
+            <div style="max-width: 680px; width: 100%; position: relative; z-index: 1;">
+                <p class="river-header-tag"
+                    style="color: #8a7a62; font-size: 0.9rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; font-weight: bold; font-family: 'Noto Sans TC', sans-serif;">
+                    救生員訓練課程</p>
+                <h2
+                    style="font-size: 2.2rem; color: #2d2a22; margin-bottom: 24px; font-weight: 700; letter-spacing: 1px; font-family: 'Noto Serif TC', serif;">
+                    訓練總結</h2>
+                <div class="divider-line"
+                    style="width: 40px; height: 3px; background: #8a7a62; margin: 0 auto 32px; border-radius: 2px;">
+                </div>
+
+                <div class="outro-text-container"
+                    style="color: #5a4f3c; font-size: 1.15rem; line-height: 1.95; text-align: left; letter-spacing: 0.5px; margin-bottom: 1.5em; font-family: 'Noto Sans TC', sans-serif;">
+                    <p>
+                        「像秀姑巒溪的激流，就需要去學橡皮艇操作方法，要因地制宜。」台灣游泳池事業協會理事長范清樂說明，每地的潮汐、海流、風浪強度與地形結構都會影響救援方式，所需專業訓練也不同。政府端難在標準化制度下發展出適宜各地水域特性的培訓內容，因此將培訓責任間接轉嫁到開放水域業者身上，由業者自行安排增能課程。
+                    </p>
+                    <p>
+                        然而，中華民國水上救生協會考試官兼國際組長許金德點出，有些民間訓練班是為檢定而設立，「（協會）隨便上課而且時數都很短，就只針對考試的項目上，不會上得很完整。」中華民國水適能訓練協會理事長江柏億也補充，當檢定考試缺乏開放水域項目
+                        ，以通過考試為主要目的學員自然也不會想花錢進行開放水域培訓，「訓練是制度需要，但當你這個（開放水域）的證照供應都沒有，我怎麼可能會有額外培訓的需求？」
+                    </p>
+                    <p>
+                        除了民間訓練內容的減少與更動外，訓練品質更存在良莠不齊的疑慮。曾擔任公辦檢定甄審人員的林智明，一看考生的動作就能分辨其出自哪個協會，「很多協會教的不是體育署考試的動作，他們還會融合一些自己覺得對的動作。」他認為真正需要改革的是訓練班的教學方式，統一且標準的訓練才能提升考生的游泳和救生能力。
+                    </p>
+                </div>
+
+                <div style="margin-top: 32px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                    <button class="nav-btn river-text-btn" data-target="menu-screen"
+                        style="background-color: transparent; color: #8a7a62; border: 2px solid #8a7a62; padding: 12px 28px; border-radius: 30px; font-size: 1.05rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-family: 'Noto Sans TC', sans-serif;">
+                        <span>返回情境選單</span>
+                        <span style="font-size: 1.1rem; line-height: 1;">⇄</span>
+                    </button>
+                    <button class="nav-btn river-text-btn" data-target="training-outro-screen-2"
+                        style="background-color: #8a7a62; color: #fdfbf8; border: none; box-shadow: 0 4px 15px rgba(138, 122, 98, 0.3); padding: 12px 28px; border-radius: 30px; font-size: 1.05rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-family: 'Noto Sans TC', sans-serif;">
+                        <span>繼續向下閱讀</span>
+                        <span style="font-size: 1.1rem; line-height: 1;">↓</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5.10.c 溪流情境：文字詳細說明頁二 -->
+        <section id="river-text-screen-2" class="screen"
+            style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(160deg, #fdfbf8 0%, #f7f2ea 50%, #fdfbf8 100%); padding: 40px; color: #2d2a22; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;">
+            <style>
+                #river-text-screen-2 .outro-text-container p {
+                    margin-bottom: 1.2em;
+                }
+
+                #river-text-screen-2 .outro-text-container p:last-child {
+                    margin-bottom: 0;
+                }
+
+                @media (max-width: 768px) {
+                    #river-text-screen-2 {
+                        padding: 24px !important;
+                    }
+
+                    #river-text-screen-2 .river-header-tag {
+                        margin-bottom: 10px !important;
+                    }
+
+                    #river-text-screen-2 h2 {
+                        font-size: 1.8rem !important;
+                        margin-bottom: 16px !important;
+                    }
+
+                    #river-text-screen-2 .divider-line {
+                        margin-bottom: 20px !important;
+                    }
+
+                    #river-text-screen-2 .outro-text-container {
+                        font-size: 0.95rem !important;
+                        line-height: 1.75 !important;
+                    }
+
+                    #river-text-screen-2 .outro-text-container p {
+                        margin-bottom: 1em;
+                    }
+
+                    .river-text-btn-2 {
+                        padding: 10px 24px !important;
+                        font-size: 0.95rem !important;
+                    }
+                }
+            </style>
+
+            <!-- 裝飾性光暈層 -->
+            <div
+                style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(210, 185, 140, 0.15) 0%, transparent 65%); pointer-events: none; z-index: 0;">
+            </div>
+
+            <div style="max-width: 680px; width: 100%; position: relative; z-index: 1;">
+                <p class="river-header-tag"
+                    style="color: #8a7a62; font-size: 0.9rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; font-weight: bold; font-family: 'Noto Sans TC', sans-serif;">
+                    人力與維安輔助</p>
+                <h2
+                    style="font-size: 2.2rem; color: #2d2a22; margin-bottom: 24px; font-weight: 700; letter-spacing: 1px; font-family: 'Noto Serif TC', serif;">
+                    未來展望</h2>
+                <div class="divider-line"
+                    style="width: 40px; height: 3px; background: #8a7a62; margin: 0 auto 32px; border-radius: 2px;">
+                </div>
+
+                <div class="outro-text-container"
+                    style="color: #5a4f3c; font-size: 1.15rem; line-height: 1.95; text-align: left; letter-spacing: 0.5px; margin-bottom: 1.5em; font-family: 'Noto Sans TC', sans-serif;">
+                    <p>
+                        「就是這個以外，再加入未來的人力，像是義務役，我會想那這麼多兵，以學生的角度看，只會覺得，在這個太多人、那人很多，這跟我也沒關係。可是如果學生也想跟著人跑，就想加入。」黃國倫（清華大學體育室助理教授、中華水救理事）指出，可以加入學生或是義務役作為輔助維安人力，提升整體防溺網絡。
+                    </p>
+                    <p>
+                        除了傳統人力的配置，科技輔助救援也是未來的重要方向。透過無人機巡邏、AI 影像辨識系統監控水域異常，能更快速地在第一時間發現溺水徵兆，並即時通報救生人員，降低救援時間與人力的損耗。
+                    </p>
+                    <p>
+                        藉由結合社區、學校與科技的多方資源，未來的防溺工作將不再只依賴單一體制，而是能建立更全面、即時的防護網，確保開放水域的安全。
+                    </p>
+                </div>
+
+                <div style="margin-top: 32px; display: flex; justify-content: center;">
+                    <button class="nav-btn river-text-btn-2" data-target="menu-screen"
+                        style="background-color: #8a7a62; color: #fdfbf8; border: none; box-shadow: 0 4px 15px rgba(138, 122, 98, 0.3); padding: 12px 28px; border-radius: 30px; font-size: 1.05rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-family: 'Noto Sans TC', sans-serif;">
+                        <span>返回情境選單</span>
+                        <span style="font-size: 1.1rem; line-height: 1;">⇄</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. 溪邊情境 -->
+        <section id="river-screen" class="screen">
+            <div class="content">
+                <h2>溪邊危險地方 ⇄ 找出危險的人</h2>
+                <p>這裡是溪邊情境的探索與互動。</p>
+                <div class="action-buttons">
+                    <button class="nav-btn secondary" data-target="menu-screen">返回選單</button>
+                    <button class="nav-btn" data-target="entry-intro-screen">完成探索，繼續前進</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. 視差滾動與差異 (Scrollytelling 數位敘事版) -->
+        <section id="parallax-screen" class="screen scrolly-container">
+            <!-- 固定的背景層 (Sticky Background) -->
+            <div class="scrolly-bg-container">
+                <!-- 2. 海邊危險影片區塊 -->
+                <div class="scrolly-bg">
+                    <video class="bg-video" autoplay loop muted playsinline
+                        poster="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?q=80&w=2000&auto=format&fit=crop">
+                        <!-- 之後請將 src 替換為您的實際影片路徑 -->
+                        <source src="assets/ocean-danger.mp4" type="video/mp4">
+                    </video>
+                </div>
+
+                <!-- 3. 溪邊危險影片區塊 -->
+                <div class="scrolly-bg">
+                    <video class="bg-video" autoplay loop muted playsinline
+                        poster="https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?q=80&w=2000&auto=format&fit=crop">
+                        <source src="assets/river-danger.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <!-- 滾動的前景文字層 (Scrolling Content) -->
+            <div class="scrolly-text-container">
+                <div class="scrolly-step" data-index="0">
+                    <div class="parallax-content">
+                        <div class="parallax-text-box empty-box"></div>
+                    </div>
+                </div>
+
+                <div class="scrolly-step" data-index="1">
+                    <div class="parallax-content right-align">
+                        <div class="parallax-text-box empty-box"></div>
+                    </div>
+                </div>
+
+                <div class="scrolly-step" data-index="2">
+                    <div class="parallax-content center-align">
+                        <div class="parallax-text-box empty-box"
+                            style="display:flex; justify-content:center; align-items:center;">
+                            <button class="nav-btn" data-target="compare-menu-screen">前往各國制度比較 ➡</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 預留底部空間讓最後一個區塊可以滾動到中間 -->
+                <div class="scrolly-spacer"></div>
+            </div>
+        </section>
+
+        <!-- 8. 各國制度比較選單 -->
+        <section id="compare-menu-screen" class="screen">
+            <style>
+                /* 基礎重設 - 融合漫畫風暗色美學 */
+                #compare-menu-screen {
+                    margin: 0;
+                    padding: 0;
+                    display: block !important;
+                    font-family: 'Helvetica Neue', Arial, 'Microsoft JhengHei', sans-serif;
+                    background-color: #1a1a1a;
+                    color: #f5f5f5;
+                    -webkit-font-smoothing: antialiased;
+                    overflow: hidden !important;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                /* 固定背景海景 - 已調亮遮罩透明度 */
+                #compare-menu-screen .compare-bg-container {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background-image: linear-gradient(rgba(26, 26, 26, 0.3), rgba(26, 26, 26, 0.45)), url('https://i.meee.com.tw/PxGUcYN.jpg');
+                    background-size: cover;
+                    background-position: center;
+                    z-index: 1;
+                    transition: filter 1s ease;
+                }
+
+                #compare-menu-screen .compare-bg-container.darken {
+                    filter: brightness(0.1) saturate(0);
+                }
+
+                /* 滾動總軌道 */
+                #compare-menu-screen .compare-scroll-track {
+                    position: relative;
+                    height: 2500px; 
+                    z-index: 2;
+                }
+
+                /* 【左右並置舞台】 */
+                #compare-menu-screen .compare-split-stage {
+                    position: fixed;
+                    top: 47%; 
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 96%;
+                    max-width: 1250px;
+                    height: 650px; 
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 40px;
+                    z-index: 10;
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+                }
+
+                #compare-menu-screen .compare-split-stage.stage-active {
+                    opacity: 1;
+                    pointer-events: auto;
+                }
+
+                #compare-menu-screen .compare-split-stage.fade-out {
+                    opacity: 0;
+                    transform: translate(-50%, calc(-50% - 30px));
+                }
+
+                #compare-menu-screen .compare-left-panel, 
+                #compare-menu-screen .compare-right-panel {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                /* ===================================================
+                   3D 漫畫風國家字卡
+                   =================================================== */
+                #compare-menu-screen .compare-country-card {
+                    box-sizing: border-box;
+                    width: 100%;
+                    height: 100%;
+                    background: #ffffff;
+                    border: 3px solid #000000;
+                    color: #111111;
+                    padding: 25px 30px;
+                    box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
+                    border-radius: 225px 15px 255px 15px / 15px 255px 15px 225px;
+                }
+
+                #compare-menu-screen .compare-right-panel .compare-country-card {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    opacity: 0;
+                    transform: translateY(100vh) scale(1) rotate(var(--r, 5deg));
+                    visibility: hidden;
+                    transition: 
+                        transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.4s ease,
+                        visibility 0.4s ease,
+                        filter 0.5s ease;
+                }
+
+                #compare-menu-screen .compare-right-panel .compare-country-card.active-top {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateY(0) scale(1) rotate(var(--r, 0deg));
+                    filter: brightness(1);
+                    z-index: 5;
+                }
+                #compare-menu-screen .compare-right-panel .compare-country-card.layer-1 {
+                    opacity: 0.85;
+                    visibility: visible;
+                    transform: translateY(-16px) scale(0.96) rotate(var(--r, 0deg));
+                    filter: brightness(0.85);
+                    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.8);
+                    z-index: 4;
+                }
+                #compare-menu-screen .compare-right-panel .compare-country-card.layer-deep {
+                    opacity: 0;
+                    visibility: hidden;
+                    transform: translateY(-48px) scale(0.88) rotate(var(--r, 0deg));
+                    z-index: 1;
+                }
+
+                /* 左側台灣固定卡片 */
+                #compare-menu-screen .compare-tw-fixed-card {
+                    background: #fffdef;
+                    border-color: #dc2626;
+                    box-shadow: 8px 8px 0px #dc2626;
+                }
+                #compare-menu-screen .compare-tw-fixed-card .compare-country-name { color: #dc2626 !important; }
+                #compare-menu-screen .compare-tw-fixed-card .compare-issuer-badge { background: #dc2626 !important; border-color: #dc2626 !important; }
+                #compare-menu-screen .compare-tw-fixed-card .compare-info-block { background: #faf9f0 !important; border-color: #dc2626 !important; box-shadow: 3px 3px 0px #dc2626 !important; }
+                #compare-menu-screen .compare-tw-fixed-card .compare-block-label::before { background: #dc2626 !important; }
+                #compare-menu-screen .compare-tw-fixed-card .compare-block-text { color: #7f1d1d !important; }
+                #compare-menu-screen .compare-tw-fixed-card .compare-tag { background: #fee2e2 !important; color: #991b1b !important; border-color: #fca5a5 !important;}
+
+                /* 字卡內部結構排版 */
+                #compare-menu-screen .compare-card-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 2px dashed #e2e8f0;
+                    padding-bottom: 12px;
+                    margin-bottom: 14px;
+                    gap: 10px;
+                }
+                #compare-menu-screen .compare-country-name {
+                    font-size: 2rem; 
+                    font-weight: 900;
+                    color: #1e293b;
+                    margin: 0;
+                    letter-spacing: 1px;
+                    text-wrap: balance;
+                }
+                #compare-menu-screen .compare-issuer-badge {
+                    background: #0f172a;
+                    color: #ffffff;
+                    font-size: 0.9rem; 
+                    font-weight: 700;
+                    padding: 6px 14px;
+                    border-radius: 6px;
+                    border: 2px solid #000;
+                    white-space: nowrap;
+                }
+
+                /* 考照環境直觀視覺看板 */
+                #compare-menu-screen .compare-env-banner {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    background: #f1f5f9;
+                    border: 2px solid #000000;
+                    border-radius: 8px;
+                    padding: 10px 16px;
+                    margin-bottom: 16px;
+                    box-shadow: 3px 3px 0px #000000;
+                }
+                #compare-menu-screen .compare-tw-fixed-card .compare-env-banner {
+                    background: #fef2f2;
+                    border-color: #dc2626;
+                    box-shadow: 3px 3px 0px #dc2626;
+                }
+                #compare-menu-screen .compare-env-title {
+                    font-size: 0.95rem; 
+                    font-weight: 900;
+                    color: #475569;
+                    white-space: nowrap;
+                }
+                #compare-menu-screen .compare-tw-fixed-card .compare-env-title { color: #b91c1c; }
+                #compare-menu-screen .compare-env-tags {
+                    display: flex;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                }
+                #compare-menu-screen .compare-env-badge {
+                    font-size: 0.9rem; 
+                    font-weight: 800;
+                    padding: 3px 10px;
+                    border-radius: 4px;
+                    border: 1px solid #000;
+                    white-space: nowrap;
+                }
+                
+                #compare-menu-screen .compare-level-section {
+                    margin-bottom: 14px;
+                    text-align: left;
+                }
+                #compare-menu-screen .compare-level-title {
+                    font-size: 0.85rem; 
+                    color: #64748b;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    margin-bottom: 6px;
+                    letter-spacing: 1px;
+                }
+                #compare-menu-screen .compare-level-tags {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                }
+                #compare-menu-screen .compare-tag {
+                    background: #f1f5f9;
+                    color: #334155;
+                    font-size: 0.9rem; 
+                    font-weight: 700;
+                    padding: 4px 12px;
+                    border-radius: 4px;
+                    border: 1px solid #cbd5e1;
+                    white-space: nowrap;
+                }
+
+                #compare-menu-screen .compare-info-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 16px;
+                    text-align: left;
+                }
+
+                #compare-menu-screen .compare-info-block {
+                    background: #f8fafc;
+                    border: 2px solid #000000;
+                    border-radius: 8px;
+                    padding: 14px 16px;
+                    box-shadow: 3px 3px 0px rgba(0,0,0,1);
+                    height: 175px; 
+                    overflow-y: auto; 
+                }
+
+                #compare-menu-screen .compare-block-label {
+                    font-size: 0.95rem; 
+                    font-weight: 800;
+                    margin-bottom: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    text-wrap: balance;
+                    color: #1a1a1a;
+                }
+                #compare-menu-screen .compare-block-label::before {
+                    content: ''; width: 8px; height: 8px; background: #3b82f6; border-radius: 50%; display: inline-block; flex-shrink: 0;
+                }
+
+                #compare-menu-screen .compare-block-text {
+                    font-size: 1rem; 
+                    line-height: 1.6; 
+                    color: #334155;
+                    margin: 0;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;  
+                    text-align: justify;    
+                    text-wrap: pretty;      
+                }
+
+                /* 漫畫風極限數據對比條 */
+                #compare-menu-screen .compare-stat-bar-container {
+                    margin-top: 4px;
+                    margin-bottom: 8px;
+                }
+                #compare-menu-screen .compare-stat-label {
+                    font-size: 0.85rem; 
+                    font-weight: 800;
+                    color: #475569;
+                    margin-bottom: 4px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start; 
+                    gap: 8px;
+                }
+                #compare-menu-screen .compare-stat-label span {
+                    white-space: nowrap;
+                }
+                #compare-menu-screen .compare-tw-fixed-card .compare-stat-label { color: #991b1b; }
+                #compare-menu-screen .compare-stat-bar-outer {
+                    width: 100%;
+                    height: 12px; 
+                    background: #e2e8f0;
+                    border: 1.5px solid #000;
+                    border-radius: 4px;
+                    overflow: hidden;
+                    position: relative;
+                }
+                #compare-menu-screen .compare-stat-bar-fill {
+                    height: 100%;
+                    background: #3b82f6;
+                    border-right: 1.5px solid #000;
+                    transition: width 0.5s ease;
+                }
+                #compare-menu-screen .compare-tw-fixed-card .compare-stat-bar-fill {
+                    background: #ef4444;
+                }
+
+                #compare-menu-screen .compare-info-block::-webkit-scrollbar { width: 4px; }
+                #compare-menu-screen .compare-info-block::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+                /* 響應式手機版適配 */
+                @media (max-width: 900px) {
+                    #compare-menu-screen .compare-split-stage {
+                        grid-template-columns: 1fr;
+                        grid-template-rows: 1fr 1fr;
+                        gap: 15px;
+                        height: 80vh;
+                        top: 49%; 
+                    }
+                    #compare-menu-screen .compare-info-grid { gap: 8px; }
+                    #compare-menu-screen .compare-info-block { height: 95px; padding: 8px 12px; }
+                    #compare-menu-screen .compare-country-name { font-size: 1.4rem; }
+                    #compare-menu-screen .compare-block-text { font-size: 0.85rem; }
+                    #compare-menu-screen .compare-stat-label { font-size: 0.72rem; gap: 4px; } 
+                    #compare-menu-screen .compare-right-panel .compare-country-card { transform: translateX(100vw) scale(1); }
+                    #compare-menu-screen .compare-env-banner { margin-bottom: 6px; padding: 6px 10px; }
+                    #compare-menu-screen .compare-env-badge, 
+                    #compare-menu-screen .compare-issuer-badge { font-size: 0.8rem; }
+                }
+            </style>
+
+            <div class="compare-bg-container"></div>
+
+            <div class="compare-scroll-track">
+                <div class="compare-split-stage stage-active">
+                    
+                    <!-- 左側欄位：台灣 -->
+                    <div class="compare-left-panel">
+                        <div class="compare-country-card compare-tw-fixed-card">
+                            <div class="compare-card-header">
+                                <h2 class="compare-country-name">台灣 (TWN) 🚨</h2>
+                                <span class="compare-issuer-badge">教育部體育署</span>
+                            </div>
+
+                            <!-- 環境看板 -->
+                            <div class="compare-env-banner">
+                                <span class="compare-env-title">考照環境：</span>
+                                <div class="compare-env-tags">
+                                    <span class="compare-env-badge" style="background: #fee2e2; color: #991b1b;">🏨 100% 溫水游泳池</span>
+                                    <span class="compare-env-badge" style="background: #fee2e2; color: #991b1b;">❌ 缺乏風、流、浪環境</span>
+                                </div>
+                            </div>
+
+                            <div class="compare-level-section">
+                                <div class="compare-level-title">現行制度</div>
+                                <div class="compare-level-tags">
+                                    <span class="compare-tag">❌ 兩證合一（不分泳池或開放水域）</span>
+                                </div>
+                            </div>
+                            <div class="compare-info-grid">
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label">必考體能 / 游泳指標</div>
+                                    <p class="compare-block-text">• 200米連續泳<br>（救生四式，限時6分鐘）。<br>• 3分鐘踩水。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label">著衣與實戰抗壓</div>
+                                    
+                                    <!-- 極限數據條 -->
+                                    <div class="compare-stat-bar-container">
+                                        <div class="compare-stat-label"><span>強制著衣游泳距離</span><span>0 米</span></div>
+                                        <div class="compare-stat-bar-outer"><div class="compare-stat-bar-fill" style="width: 0%;"></div></div>
+                                    </div>
+                                    <p class="compare-block-text" style="font-size: 0.9rem; opacity: 0.85;">• 現行考照制度無強制著衣游與水中脫衣要求。</p>
+                                </div>
+                                <div class="compare-info-block" style="border: 3px solid #dc2626;">
+                                    <div class="compare-block-label" style="color:#dc2626; font-weight:900;">⚠️ 考照環境核心痛點</div>
+                                    <p class="compare-block-text" style="font-weight: 900; color: #dc2626;">• 考照環境完全在室內，缺乏真實大自然溪海情境考核，實戰力面臨極大代溝。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label">潛水與打撈要求</div>
+                                    <p class="compare-block-text">• 15公尺水面潛泳。<br>• 抬頭捷/蛙泳接近、拖帶假人。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側欄位：各國動態字卡輪播 -->
+                    <div class="compare-right-panel">
+                        
+                        <!-- 德國 -->
+                        <div class="compare-country-card" data-step="1">
+                            <div class="compare-card-header">
+                                <h2 class="compare-country-name">德國 (GER) 🇩🇪</h2>
+                                <span class="compare-issuer-badge">德國救生協會 (DLRG)</span>
+                            </div>
+
+                            <!-- 環境看板 -->
+                            <div class="compare-env-banner">
+                                <span class="compare-env-title">實戰考核：</span>
+                                <div class="compare-env-tags">
+                                    <span class="compare-env-badge" style="background: #e0f2fe; color: #0369a1;">🏊‍♂️ 泳池培訓</span>
+                                    <span class="compare-env-badge" style="background: #f0fdf4; color: #16a34a;">🌊 強制開放水域實習</span>
+                                </div>
+                            </div>
+
+                            <div class="compare-level-section">
+                                <div class="compare-level-title">分級體系</div>
+                                <div class="compare-level-tags">
+                                    <span class="compare-tag">銅級 (不具執業力)</span>
+                                    <span class="compare-tag">銀級 (開放水域執業)</span>
+                                    <span class="compare-tag">金級 (專業項目)</span>
+                                </div>
+                            </div>
+                            <div class="compare-info-grid">
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #2563eb;">必考體能 / 游泳指標</div>
+                                    <p class="compare-block-text">• 400米游泳<br>（限時15分，含無手仰泳）。<br>• 50米帶人游泳<br>（限時1.5分）。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #0891b2;">著衣與實戰抗壓</div>
+
+                                    <!-- 極限數據條 -->
+                                    <div class="compare-stat-bar-container">
+                                        <div class="compare-stat-label"><span>強制著衣游泳距離</span><span>300 米</span></div>
+                                        <div class="compare-stat-bar-outer"><div class="compare-stat-bar-fill" style="width: 75%;"></div></div>
+                                    </div>
+                                    <p class="compare-block-text" style="font-size: 0.9rem; opacity: 0.85;">• 限時 12 分鐘內完成，並要求在水中完成衣物脫除考核。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #16a34a; font-weight: 900;">✨ 實戰對比</div>
+                                    <p class="compare-block-text">• 雖然同樣有池培訓，但<b>強制規定</b>：考照後必須通過大自然水域實習考核，才算具備執業能力。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #d97706;">潛水與打撈要求</div>
+                                    <p class="compare-block-text">• 3-5米深水打撈：潛入抱起 5 公斤重物。<br>• 25公尺潛泳。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 澳洲 -->
+                        <div class="compare-country-card" data-step="2">
+                            <div class="compare-card-header">
+                                <h2 class="compare-country-name">澳洲 (AUS) 🇦🇺</h2>
+                                <span class="compare-issuer-badge">RLSA / SLSA 雙軌制</span>
+                            </div>
+
+                            <!-- 環境看板 -->
+                            <div class="compare-env-banner">
+                                <span class="compare-env-title">考照環境：</span>
+                                <div class="compare-env-tags">
+                                    <span class="compare-env-badge" style="background: #fdfbc7; color: #854d0e;">🏖️ 真實海灘環境</span>
+                                    <span class="compare-env-badge" style="background: #f0fdf4; color: #16a34a;">🌊 狂浪、洋流與離岸流術科</span>
+                                </div>
+                            </div>
+
+                            <div class="compare-level-section">
+                                <div class="compare-level-title">平靜泳池與開放衝浪分流</div>
+                                <div class="compare-level-tags">
+                                    <span class="compare-tag">初階安全</span>
+                                    <span class="compare-tag">泳池救生員</span>
+                                    <span class="compare-tag">衝浪救援證書</span>
+                                    <span class="compare-tag">金牌資深巡邏</span>
+                                </div>
+                            </div>
+                            <div class="compare-info-grid">
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #2563eb;">必考體能 / 游泳指標</div>
+                                    <p class="compare-block-text">• 400米泳池泳<br>（限時 9 分鐘）。<br>• <b>Run-Swim-Run</b>：跑200米-海泳200米-跑200米<br>（限時 8 分鐘）。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #0891b2;">著衣與實戰抗壓</div>
+
+                                    <!-- 極限數據條 -->
+                                    <div class="compare-stat-bar-container">
+                                        <div class="compare-stat-label"><span>真實海浪潛越與洋流考核</span><span>100% 實戰</span></div>
+                                        <div class="compare-stat-bar-outer"><div class="compare-stat-bar-fill" style="width: 100%; background: #10b981;"></div></div>
+                                    </div>
+                                    <p class="compare-block-text" style="font-size: 0.9rem; opacity: 0.85;">• 必須在真實海浪與離岸流中進行衝浪救生板及潛越救援。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #16a34a; font-weight: 900;">✨ 實戰對比</div>
+                                    <p class="compare-block-text" style="font-weight: 700;">• <b>嚴格分流考核</b>：依據級別，分別在游泳池與完全天然的真實海灘進行嚴酷考核，絕不交叉混用。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #d97706;">急救與工具操作</div>
+                                    <p class="compare-block-text">• 開訓前必先取得急救證。<br>• 沙灘迅速組裝高濃度氧氣與 BVM 操作。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 美國 -->
+                        <div class="compare-country-card" data-step="3">
+                            <div class="compare-card-header">
+                                <h2 class="compare-country-name">美國 (USA) 🇺🇸</h2>
+                                <span class="compare-issuer-badge">美國紅十字會 / USLA</span>
+                            </div>
+
+                            <!-- 環境看板 -->
+                            <div class="compare-env-banner">
+                                <span class="compare-env-title">水域考核：</span>
+                                <div class="compare-env-tags">
+                                    <span class="compare-env-badge" style="background: #e0f2fe; color: #0369a1;">🌊 開放水域專用證</span>
+                                    <span class="compare-env-badge" style="background: #fee2e2; color: #991b1b;">🚫 禁止跨水域盲目執業</span>
+                                </div>
+                            </div>
+
+                            <div class="compare-level-section">
+                                <div class="compare-level-title">水域環境精準分流</div>
+                                <div class="compare-level-tags">
+                                    <span class="compare-tag">標準泳池</span>
+                                    <span class="compare-tag">水上樂園</span>
+                                    <span class="compare-tag">開放水域救生</span>
+                                    <span class="compare-tag">進階海濱救生</span>
+                                </div>
+                            </div>
+                            <div class="compare-info-grid">
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #2563eb;">必考體能 / 游泳指標</div>
+                                    <p class="compare-block-text">• 300碼連續游泳（捷/蛙）。<br>• 2 分鐘無手踩水<br>（雙手夾腋下）。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #0891b2;">限時深水打撈要求</div>
+
+                                    <!-- 極限數據條 - 採用彈性垂直排列（Flex Column），完美解決換行與不斷字的排版衝突 -->
+                                    <div class="compare-stat-bar-container">
+                                        <div class="compare-stat-label">
+                                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                                <span>2-3米深撈</span>
+                                                <span>10磅重磚並捧磚仰泳</span>
+                                            </div>
+                                            <span>限時 1分40秒</span>
+                                        </div>
+                                        <div class="compare-stat-bar-outer"><div class="compare-stat-bar-fill" style="width: 90%; background: #f59e0b;"></div></div>
+                                    </div>
+                                    <p class="compare-block-text" style="font-size: 0.9rem; opacity: 0.85;">• 屬於高壓心理考核：考驗在極短時間與深度下的負重與控氧能力。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #16a34a; font-weight: 900;">✨ 實戰對比</div>
+                                    <p class="compare-block-text">• 依環境在游泳池與海灘進行獨立對應考核。保護民眾安全之餘，也拒絕拿泳池技術去海裡送命。</p>
+                                </div>
+                                <div class="compare-info-block">
+                                    <div class="compare-block-label" style="color: #d97706;">急救與工具操作</div>
+                                    <p class="compare-block-text">• 專業級 CPR/AED<br>（含嬰幼兒）。<br>• 緊急氧氣供應與袋瓣罩甦醒球操作。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 各國制度比較後續文字頁一 (報導者風格整合版) -->
+        <section id="post-compare-text-1" class="screen"
+            style="display: block !important; background-color: #faf8f5; color: #2d2a22; position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto !important; padding: 0;">
+            <style>
+                #post-compare-text-1::-webkit-scrollbar {
+                    width: 6px;
+                }
+                #post-compare-text-1::-webkit-scrollbar-track {
+                    background: #faf8f5;
+                }
+                #post-compare-text-1::-webkit-scrollbar-thumb {
+                    background: #d6cfc4;
+                    border-radius: 3px;
+                }
+                #post-compare-text-1::-webkit-scrollbar-thumb:hover {
+                    background: #b5ac9d;
+                }
+                @media (max-width: 768px) {
+                    .reporter-article-wrapper {
+                        padding: 60px 20px 100px 20px !important;
+                    }
+                    .reporter-article-wrapper h2 {
+                        font-size: 1.7rem !important;
+                        margin-top: 40px !important;
+                        margin-bottom: 18px !important;
+                        padding-left: 12px !important;
+                    }
+                    .reporter-article-wrapper p {
+                        font-size: 1.05rem !important;
+                        line-height: 1.85 !important;
+                        margin-bottom: 22px !important;
+                    }
+                    .reporter-article-wrapper blockquote {
+                        font-size: 1.15rem !important;
+                        margin: 30px 0 !important;
+                        padding-left: 16px !important;
+                    }
+                }
+            </style>
+            
+            <div class="reporter-article-wrapper" style="max-width: 660px; margin: 0 auto; padding: 90px 24px 120px 24px; font-family: 'Noto Sans TC', system-ui, sans-serif;">
+                
+
+                <!-- 章節一 -->
+                <h2 style="font-family: 'Noto Serif TC', Georgia, serif; font-size: 2.1rem; font-weight: 700; color: #2c2c2c; line-height: 1.45; margin-top: 10px; margin-bottom: 24px; letter-spacing: 0.5px; border-left: 4px solid #8a7a62; padding-left: 16px; text-align: left;">
+                    低薪及高風險成推力　救生人才難久留
+                </h2>
+                
+                <p style="font-size: 1.125rem; line-height: 2.0; color: #3a3a3a; margin-bottom: 28px; letter-spacing: 0.8px; text-align: justify;">
+                    談及救生員缺工主因，薪資水準是一大關鍵。目前兼職救生員的時薪落在200至250元，月薪超過四萬的更是少之又少，部分水域還會有淡旺季之分，讓救生員的工作生態也因此越趨季節性，除影響留任意願，也進一步導致臺灣難以如法炮製國外常見的救生員檢定分級制度。劉家豪無奈地說：「臺灣連考出一張證照都有問題，更何況是不同級數的好幾張？」臺灣的救生員也缺乏升遷管道，曾擔任海邊救生員三年的蕉哥（化名）提出他的觀察，「因為救生員再往上做，你可能只能做救生主管，並沒有太往上的發展空間。」因此許多救生員選擇跨足教學領域，或是直接轉職當游泳教練，也讓救生員的需求產生缺口。
+                </p>
+                <p style="font-size: 1.125rem; line-height: 2.0; color: #3a3a3a; margin-bottom: 28px; letter-spacing: 0.8px; text-align: justify;">
+                    「因為這個行業，大家的既定印象就是你沒事坐在那邊，我幹嘛花那麼多錢請你？比較把救生員看成是保全吧。」國立政治大學游泳館管理員芳姐（化名），道出社會大眾對救生員的觀感。蕉哥投入此行業多年，也分享身邊親友的看法，「他們會覺得你在這邊曬太陽、看風景、看很多人在玩水，很愜意的樣子。」在這樣的社會觀感基礎上，江柏億認為媒體環境對救生員不甚友善，導致他們懷抱救人理想的初衷逐漸被消磨。「大家會有英雄夢，覺得救援很帥，覺得我有社會責任當這個角色，但其實這塊一直沒有被重視。」顯示救生員與同樣擔起救生責任的消防、醫護人員相比，普遍難認為是「英雄」。
+                </p>
+                <p style="font-size: 1.125rem; line-height: 2.0; color: #3a3a3a; margin-bottom: 28px; letter-spacing: 0.8px; text-align: justify;">
+                    「如果你的薪水跟一般服務業相比差不多，但人家不用背法律責任，那我為什麼要做一個有法律風險的工作？」蕉哥認為救生員肩上背負的責任是讓很多人卻步的主因。投入救援時，除了自己的人身安全外，若是沒成功救溺，更會面臨延伸的官司。他分享，「每個個案實際的法律責任不太一樣，但不管如何，救生員的賠償金額可能都是七位數起跳。」在低廉的薪資面前，賠償金就如同天文數字，讓救生工作不僅是體力與技術的考驗，更需承擔極高的心理壓力。
+                </p>
+                <p style="font-size: 1.125rem; line-height: 2.0; color: #3a3a3a; margin-bottom: 28px; letter-spacing: 0.8px; text-align: justify;">
+                    多重因素交織下，開放水域救生員缺工問題日益嚴重。林智明觀察，目前開放水域救生員出現明顯的人力斷層，逐漸浮現年齡結構失衡的現象，「老一輩知道要怎麼拉風浪流的警戒線，但沒有年輕人可以傳承。」雪上加霜的是，救生員需定期展延證照的制度，不斷降低實務工作者的續職意願，讓整體人力更加吃緊。當缺工問題反映在現狀上，中華海浪救生總會第七屆理事長張中銘點出，「業者如果不鋌而走險違法超收遊客，或是降低救生員比例來維持營運，就只能選擇暫停營業。」廖國盛也進一步說明，「結果就是很多地方連只有協會證照的救生員都拿來用。」
+                </p>
+
+                <!-- 中間插圖 -->
+                <div style="margin: 48px 0; text-align: center;">
+                    <img src="中間插圖.jpg" alt="中間插圖" style="width: 100%; max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: block; margin: 0 auto;" />
+                </div>
+
+
+                
+                <p style="font-size: 1.125rem; line-height: 2.0; color: #3a3a3a; margin-bottom: 28px; letter-spacing: 0.8px; text-align: justify;">
+                    「通過率降低其實也有好處，現在很多地方的時薪已經開到250元以上了。」林智明苦笑地說。但據他觀察，最有效的誘因仍是提升薪資水準，「只要錢到位了，一切問題都能迎刃而解。」撇除薪資結構的問題，劉家豪點出，救生員一旦踏入場館值班，即具備法律上的「保證人地位」（註）。不過，他主張救生員若在救援過程中已施以標準救援程序，就不應使其獨自承擔涉訟風險，他說：「可以跟醫護人員一樣有合理免責的機制，或是政府替我們啟動專屬的保險制度。」如此一來，便有可能降低求職者對於安全的疑慮，減緩缺工問題。
+                </p>
+                <p style="font-size: 0.95rem; line-height: 1.8; color: #6e6e6e; margin-bottom: 32px; letter-spacing: 0.5px; text-align: justify; font-style: italic; opacity: 0.95; padding-left: 12px; border-left: 2px solid #d6cfc4;">
+                    註：指法律上因特定職務或身分，而負有防止他人生命、身體法益受侵害之義務；若未履行該義務而導致損害發生，可能需負刑事責任。
+                </p>
+                <p style="font-size: 1.125rem; line-height: 2.0; color: #3a3a3a; margin-bottom: 28px; letter-spacing: 0.8px; text-align: justify;">
+                    除了法律的改制，蕉哥也提出可以從教育著手，他認為學習游泳是臺灣孩子們的常態，但教學和實務上仍存在落差。因此他創立「像一條魚LikeAFish」品牌，以自身經驗推廣防溺教育。希望能讓開放水域安全受到普遍重視，如此能降低溺水事故的發生率，同時也能減緩救生員的負擔。
+                </p>
+
+                <!-- 結尾圖片與圖說 -->
+                <div style="margin: 48px 0;">
+                    <img src="結尾圖片.png" alt="結尾圖片" style="width: 100%; max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: block; margin: 0 auto;" />
+                    <div style="font-size: 0.85rem; color: #555555; line-height: 1.6; margin-top: 12px; font-family: 'Noto Sans TC', sans-serif; text-align: left; letter-spacing: 0.5px;">
+                        救生員的存在，不僅為民眾打造安心的水域，更是臺灣從海島國家邁向海洋國家的基石。
+                        <span style="color: #888888; margin-left: 8px;">— 張中銘說到。　圖／中華海浪救生總會提供</span>
+                    </div>
+                </div>
+
+                <p style="font-size: 1.125rem; line-height: 2.0; color: #3a3a3a; margin-bottom: 28px; letter-spacing: 0.8px; text-align: justify;">
+                    臺灣身為一個海島國家，無法遠離溪流和海洋，但真正的水域安全，不應只建立在泳池考出的證照，救生員也不該只是單純仰賴個人使命感支撐的行業。救生員肩負了生命的重量，而政府也應建立完善保障，成為他們願意在險峻水域中投入生命的後盾。
+                </p>
+
+                <!-- 報導者風格文章底部的結尾卡片 -->
+                <div style="margin-top: 80px; padding: 48px 40px; background-color: #343f4b; border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;">
+                    <!-- Credits Grid -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px 40px; justify-content: center; max-width: 600px; margin: 0 auto 36px auto; font-family: 'Noto Sans TC', sans-serif; font-size: 0.9rem; line-height: 1.8; color: rgba(255, 255, 255, 0.85); text-align: left;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <span style="font-weight: bold; color: #ffffff; margin-right: 4px;">採訪：</span>王翊丞、呂詠倢、熊子萱、林家慶<br>
+                            <span style="font-weight: bold; color: #ffffff; margin-right: 4px;">文字：</span>王翊丞、呂詠倢、熊子萱、林家慶<br>
+                            <span style="font-weight: bold; color: #ffffff; margin-right: 4px;">攝影：</span>王翊丞、熊子萱、林家慶<br>
+                            <span style="font-weight: bold; color: #ffffff; margin-right: 4px;">製圖：</span>呂詠倢、林家慶、王翊丞
+                        </div>
+                        <div style="flex: 1; min-width: 250px;">
+                            <span style="font-weight: bold; color: #ffffff; margin-right: 4px;">數據分析：</span>熊子萱<br>
+                            <span style="font-weight: bold; color: #ffffff; margin-right: 4px;">網站架設：</span>王翊丞<br>
+                            <span style="font-weight: bold; color: #ffffff; margin-right: 4px;">網頁設計：</span>王翊丞、呂詠倢、熊子萱、林家慶<br>
+                            <span style="font-weight: bold; color: #ffffff; margin-right: 4px;">網頁製作：</span>王翊丞、呂詠倢、熊子萱、林家慶
+                        </div>
+                    </div>
+
+                    <!-- Thank you and notes -->
+                    <div style="border-top: 1px solid rgba(255,255,255,0.15); margin: 0 auto; padding-top: 28px; max-width: 620px; text-align: center; color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; line-height: 1.7; font-family: 'Noto Sans TC', sans-serif;">
+                        <p style="margin-bottom: 20px; text-align: center; letter-spacing: 0.5px;">
+                            誠摯感謝：廖家君、吳國和、劉邦禾、渚樺(化名)、闕河聖、Benny(化名)、廖國盛、吳寶昇、劉家豪、許金德、江柏億、林智明、台灣游泳池事業協會、范清樂、蕉哥（化名）、芳姐（化名）、張中銘、中華民國水適能訓練協會、中華海浪救生總會協助專題順利完成
+                        </p>
+                        <p style="margin-bottom: 24px; color: rgba(255, 255, 255, 0.6); font-size: 0.8rem; letter-spacing: 1px;">
+                            ＊本專題使用報導者數位敘事元件庫系列元件＊
+                        </p>
+                        <p style="color: rgba(255, 255, 255, 0.5); font-size: 0.8rem; margin-bottom: 0; letter-spacing: 0.5px;">
+                            2025年政大大學報 ｜ 發布日期：2025年6月30日
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 重新體驗按鈕（放置在卡片下方以保持視覺乾淨） -->
+                <div style="margin-top: 32px; text-align: center; margin-bottom: 40px;">
+                    <button class="nav-btn secondary" data-target="cover-screen" style="background-color: #2d2a22; color: #ffffff; border: none; padding: 12px 32px; font-size: 1.05rem; border-radius: 4px; font-family: 'Noto Sans TC', sans-serif; cursor: pointer; letter-spacing: 1.5px; transition: background-color 0.2s, transform 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        重新體驗
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 懸浮提示框 (置於最外層以避開 Parent Transform 造成定位偏移) -->
+    <div id="pie-floating-tooltip" class="floating-tooltip"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
