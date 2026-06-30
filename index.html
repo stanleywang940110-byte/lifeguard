@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>救生員專題 Prototype</title>
+    <title>被淹沒的英雄夢：開放水域救生員陷缺工困境</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -2054,50 +2054,228 @@
                     border-radius: 4px;
                 }
 
+                /* ===================================================
+                   當桌機/筆電螢幕高度較小時，縮小元件比例以防止垂直裁切
+                   =================================================== */
+                @media (min-width: 901px) and (max-height: 820px) {
+                    #compare-menu-screen .compare-split-stage {
+                        height: 82vh;
+                        max-height: 560px;
+                        gap: 20px;
+                        top: 48%;
+                    }
+                    #compare-menu-screen .compare-country-card {
+                        padding: 16px 20px;
+                    }
+                    #compare-menu-screen .compare-country-name {
+                        font-size: 1.5rem;
+                    }
+                    #compare-menu-screen .compare-issuer-badge {
+                        font-size: 0.8rem;
+                        padding: 4px 10px;
+                    }
+                    #compare-menu-screen .compare-env-banner {
+                        margin-bottom: 10px;
+                        padding: 6px 12px;
+                    }
+                    #compare-menu-screen .compare-level-section {
+                        margin-bottom: 8px;
+                    }
+                    #compare-menu-screen .compare-info-grid {
+                        gap: 10px;
+                    }
+                    #compare-menu-screen .compare-info-block {
+                        height: 125px;
+                        padding: 10px 12px;
+                    }
+                    #compare-menu-screen .compare-block-label {
+                        font-size: 0.85rem;
+                        margin-bottom: 4px;
+                    }
+                    #compare-menu-screen .compare-block-text {
+                        font-size: 0.85rem;
+                        line-height: 1.45;
+                    }
+                    #compare-menu-screen .compare-stat-bar-container {
+                        margin-top: 0px;
+                        margin-bottom: 6px;
+                    }
+                }
+
+                @media (min-width: 901px) and (max-height: 720px) {
+                    #compare-menu-screen .compare-split-stage {
+                        height: 88vh;
+                        max-height: 500px;
+                        gap: 15px;
+                        top: 50%;
+                    }
+                    #compare-menu-screen .compare-country-card {
+                        padding: 12px 16px;
+                        overflow-y: auto;
+                    }
+                    #compare-menu-screen .compare-country-name {
+                        font-size: 1.3rem;
+                    }
+                    #compare-menu-screen .compare-issuer-badge {
+                        font-size: 0.75rem;
+                        padding: 3px 8px;
+                    }
+                    #compare-menu-screen .compare-env-banner {
+                        margin-bottom: 8px;
+                        padding: 4px 10px;
+                    }
+                    #compare-menu-screen .compare-level-section {
+                        margin-bottom: 6px;
+                    }
+                    #compare-menu-screen .compare-info-grid {
+                        gap: 8px;
+                    }
+                    #compare-menu-screen .compare-info-block {
+                        height: 105px;
+                        padding: 8px 10px;
+                    }
+                    #compare-menu-screen .compare-block-label {
+                        font-size: 0.8rem;
+                        margin-bottom: 4px;
+                    }
+                    #compare-menu-screen .compare-block-text {
+                        font-size: 0.8rem;
+                        line-height: 1.4;
+                    }
+                    #compare-menu-screen .compare-stat-bar-container {
+                        margin-top: 0px;
+                        margin-bottom: 4px;
+                    }
+                }
+
                 /* 響應式手機版適配 */
                 @media (max-width: 900px) {
                     #compare-menu-screen .compare-split-stage {
                         grid-template-columns: 1fr;
                         grid-template-rows: 1fr 1fr;
-                        gap: 15px;
-                        height: 80vh;
-                        top: 49%;
+                        gap: 12px;
+                        height: 84vh;
+                        top: 50%;
+                        width: 95%;
                     }
 
-                    #compare-menu-screen .compare-info-grid {
-                        gap: 8px;
+                    #compare-menu-screen .compare-country-card {
+                        padding: 12px 14px;
+                        border-radius: 12px;
+                        box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+                        border-width: 2px;
                     }
 
-                    #compare-menu-screen .compare-info-block {
-                        height: 95px;
-                        padding: 8px 12px;
+                    #compare-menu-screen .compare-tw-fixed-card {
+                        box-shadow: 4px 4px 0px #dc2626;
+                        border-color: #dc2626;
+                    }
+
+                    #compare-menu-screen .compare-card-header {
+                        padding-bottom: 6px;
+                        margin-bottom: 8px;
+                        gap: 6px;
+                        border-bottom-width: 1.5px;
                     }
 
                     #compare-menu-screen .compare-country-name {
-                        font-size: 1.4rem;
+                        font-size: 1.15rem;
                     }
 
-                    #compare-menu-screen .compare-block-text {
-                        font-size: 0.85rem;
-                    }
-
-                    #compare-menu-screen .compare-stat-label {
-                        font-size: 0.72rem;
-                        gap: 4px;
-                    }
-
-                    #compare-menu-screen .compare-right-panel .compare-country-card {
-                        transform: translateX(100vw) scale(1);
+                    #compare-menu-screen .compare-issuer-badge {
+                        font-size: 0.7rem;
+                        padding: 3px 8px;
+                        border-width: 1.5px;
                     }
 
                     #compare-menu-screen .compare-env-banner {
                         margin-bottom: 6px;
-                        padding: 6px 10px;
+                        padding: 4px 8px;
+                        gap: 6px;
+                        border-width: 1.5px;
+                        box-shadow: 2px 2px 0px #000000;
                     }
 
-                    #compare-menu-screen .compare-env-badge,
-                    #compare-menu-screen .compare-issuer-badge {
-                        font-size: 0.8rem;
+                    #compare-menu-screen .compare-tw-fixed-card .compare-env-banner {
+                        box-shadow: 2px 2px 0px #dc2626;
+                        border-color: #dc2626;
+                    }
+
+                    #compare-menu-screen .compare-env-title {
+                        font-size: 0.75rem;
+                    }
+
+                    #compare-menu-screen .compare-env-badge {
+                        font-size: 0.7rem;
+                        padding: 2px 6px;
+                        border-width: 1px;
+                    }
+
+                    #compare-menu-screen .compare-level-section {
+                        margin-bottom: 6px;
+                    }
+
+                    #compare-menu-screen .compare-level-title {
+                        font-size: 0.7rem;
+                        margin-bottom: 4px;
+                    }
+
+                    #compare-menu-screen .compare-tag {
+                        font-size: 0.7rem;
+                        padding: 2px 6px;
+                        border-width: 1px;
+                    }
+
+                    #compare-menu-screen .compare-info-grid {
+                        gap: 6px;
+                    }
+
+                    #compare-menu-screen .compare-info-block {
+                        height: 72px;
+                        padding: 6px 8px;
+                        border-width: 1.5px;
+                        box-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+                    }
+
+                    #compare-menu-screen .compare-tw-fixed-card .compare-info-block {
+                        box-shadow: 2px 2px 0px #dc2626 !important;
+                        border-color: #dc2626 !important;
+                    }
+
+                    #compare-menu-screen .compare-block-label {
+                        font-size: 0.75rem;
+                        margin-bottom: 4px;
+                        gap: 4px;
+                    }
+
+                    #compare-menu-screen .compare-block-label::before {
+                        width: 6px;
+                        height: 6px;
+                    }
+
+                    #compare-menu-screen .compare-block-text {
+                        font-size: 0.7rem;
+                        line-height: 1.35;
+                    }
+
+                    #compare-menu-screen .compare-stat-bar-container {
+                        margin-top: 2px;
+                        margin-bottom: 4px;
+                    }
+
+                    #compare-menu-screen .compare-stat-label {
+                        font-size: 0.65rem;
+                        margin-bottom: 2px;
+                        gap: 4px;
+                    }
+
+                    #compare-menu-screen .compare-stat-bar-outer {
+                        height: 8px;
+                        border-width: 1px;
+                    }
+
+                    #compare-menu-screen .compare-right-panel .compare-country-card {
+                        transform: translateX(100vw) scale(1);
                     }
                 }
             </style>

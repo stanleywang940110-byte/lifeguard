@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let riverText2LastTransitionTime = 0;
     let compareStep = 0;
     let updateCompareCards = null;
+    let outro1Throttle = 0;
+    let outro2Throttle = 0;
+    let outro3Throttle = 0;
 
     // 切換畫面的核心函數
     function navigateToScreen(targetId) {
@@ -70,6 +73,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (targetId === 'river-text-screen-2') {
             riverText2LastTransitionTime = Date.now();
+        }
+
+        if (targetId === 'training-outro-screen') {
+            outro1Throttle = Date.now();
+        }
+
+        if (targetId === 'training-outro-screen-2') {
+            outro2Throttle = Date.now();
+        }
+
+        if (targetId === 'training-outro-screen-3') {
+            outro3Throttle = Date.now();
         }
 
         if (targetId === 'stats-screen') {
@@ -720,18 +735,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 
+    let outro1Accumulator = 0;
+    let outro1Timeout = null;
     const trainingOutroScreenObj = document.getElementById('training-outro-screen');
     if (trainingOutroScreenObj) {
         trainingOutroScreenObj.addEventListener('wheel', (e) => {
-            if (trainingOutroScreenObj.classList.contains('active')) {
-                if (e.deltaY < 0) {
+            if (!trainingOutroScreenObj.classList.contains('active')) return;
+
+            if (outro1Timeout) clearTimeout(outro1Timeout);
+            outro1Timeout = setTimeout(() => { outro1Accumulator = 0; }, 200);
+
+            if (Date.now() - outro1Throttle < 1000) {
+                outro1Accumulator = 0;
+                return;
+            }
+
+            if (Math.abs(e.deltaY) < 15) return;
+            outro1Accumulator += e.deltaY;
+
+            if (Math.abs(outro1Accumulator) >= 120) {
+                const direction = outro1Accumulator > 0 ? 1 : -1;
+                outro1Accumulator = 0;
+
+                if (direction < 0) {
+                    outro1Throttle = Date.now();
                     navigateToScreen('rescue-boat-video-screen');
                     if (rescueBoatVideoScreenObj) {
                         setTimeout(() => {
                             rescueBoatVideoScreenObj.scrollTop = rescueBoatVideoScreenObj.scrollHeight - rescueBoatVideoScreenObj.clientHeight;
                         }, 50);
                     }
-                } else if (e.deltaY > 0) {
+                } else if (direction > 0) {
+                    outro1Throttle = Date.now();
                     navigateToScreen('training-outro-screen-2');
                 }
             }
@@ -759,17 +794,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 
+    let outro2Accumulator = 0;
+    let outro2Timeout = null;
     const trainingOutroScreen2Obj = document.getElementById('training-outro-screen-2');
     if (trainingOutroScreen2Obj) {
         trainingOutroScreen2Obj.addEventListener('wheel', (e) => {
-            if (trainingOutroScreen2Obj.classList.contains('active')) {
-                if (e.deltaY < 0) {
+            if (!trainingOutroScreen2Obj.classList.contains('active')) return;
+
+            if (outro2Timeout) clearTimeout(outro2Timeout);
+            outro2Timeout = setTimeout(() => { outro2Accumulator = 0; }, 200);
+
+            if (Date.now() - outro2Throttle < 1000) {
+                outro2Accumulator = 0;
+                return;
+            }
+
+            if (Math.abs(e.deltaY) < 15) return;
+            outro2Accumulator += e.deltaY;
+
+            if (Math.abs(outro2Accumulator) >= 120) {
+                const direction = outro2Accumulator > 0 ? 1 : -1;
+                outro2Accumulator = 0;
+
+                if (direction < 0) {
+                    outro2Throttle = Date.now();
                     if (previousScreenId === 'river-text-screen') {
                         navigateToScreen('river-text-screen');
                     } else {
                         navigateToScreen('training-outro-screen');
                     }
-                } else if (e.deltaY > 0) {
+                } else if (direction > 0) {
+                    outro2Throttle = Date.now();
                     navigateToScreen('training-outro-screen-3');
                 }
             }
@@ -796,13 +851,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { passive: true });
     }
 
+    let outro3Accumulator = 0;
+    let outro3Timeout = null;
     const trainingOutroScreen3Obj = document.getElementById('training-outro-screen-3');
     if (trainingOutroScreen3Obj) {
         trainingOutroScreen3Obj.addEventListener('wheel', (e) => {
-            if (trainingOutroScreen3Obj.classList.contains('active')) {
-                if (e.deltaY < 0) {
+            if (!trainingOutroScreen3Obj.classList.contains('active')) return;
+
+            if (outro3Timeout) clearTimeout(outro3Timeout);
+            outro3Timeout = setTimeout(() => { outro3Accumulator = 0; }, 200);
+
+            if (Date.now() - outro3Throttle < 1000) {
+                outro3Accumulator = 0;
+                return;
+            }
+
+            if (Math.abs(e.deltaY) < 15) return;
+            outro3Accumulator += e.deltaY;
+
+            if (Math.abs(outro3Accumulator) >= 120) {
+                const direction = outro3Accumulator > 0 ? 1 : -1;
+                outro3Accumulator = 0;
+
+                if (direction < 0) {
+                    outro3Throttle = Date.now();
                     navigateToScreen('training-outro-screen-2');
-                } else if (e.deltaY > 0) {
+                } else if (direction > 0) {
+                    outro3Throttle = Date.now();
                     navigateToScreen('compare-menu-screen');
                 }
             }
@@ -844,6 +919,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let compareLastTransitionTime = 0;
         let stepThrottleTime = 0;
+        let wheelAccumulator = 0;
+        let wheelTimeout = null;
 
         updateCompareCards = function() {
             cards.forEach((card, index) => {
@@ -907,30 +984,51 @@ document.addEventListener('DOMContentLoaded', () => {
         compareMenuScreenObj.addEventListener('wheel', (e) => {
             if (!compareMenuScreenObj.classList.contains('active')) return;
 
-            if (Date.now() - stepThrottleTime < 800) return;
+            // 每次滾動都重新設定清除計時器，若使用者停止滾動 200ms 則歸零累加器
+            if (wheelTimeout) clearTimeout(wheelTimeout);
+            wheelTimeout = setTimeout(() => {
+                wheelAccumulator = 0;
+            }, 200);
 
-            if (e.deltaY > 0) {
-                // 滾輪向下
-                if (compareStep < 3) {
-                    compareStep++;
-                    stepThrottleTime = Date.now();
-                    updateCompareCards();
-                } else {
-                    if (Date.now() - compareLastTransitionTime > 1000) {
-                        compareLastTransitionTime = Date.now();
-                        navigateToScreen('post-compare-text-1');
+            // 在切換的 800ms 動畫期間，直接吸收掉所有滾輪數值（防止慣性滾動在動畫結束後瞬間觸發下一次翻頁）
+            if (Date.now() - stepThrottleTime < 800) {
+                wheelAccumulator = 0;
+                return;
+            }
+
+            // 過濾極小的滾輪噪訊
+            if (Math.abs(e.deltaY) < 15) return;
+
+            wheelAccumulator += e.deltaY;
+
+            // 必須累積達到 120 門檻值（滑鼠滾輪一格或一次果斷的雙指滑動）才觸發翻頁
+            if (Math.abs(wheelAccumulator) >= 120) {
+                const direction = wheelAccumulator > 0 ? 1 : -1;
+                wheelAccumulator = 0; // 歸零
+
+                if (direction > 0) {
+                    // 滾輪向下
+                    if (compareStep < 3) {
+                        compareStep++;
+                        stepThrottleTime = Date.now();
+                        updateCompareCards();
+                    } else {
+                        if (Date.now() - compareLastTransitionTime > 1000) {
+                            compareLastTransitionTime = Date.now();
+                            navigateToScreen('post-compare-text-1');
+                        }
                     }
-                }
-            } else if (e.deltaY < 0) {
-                // 滾輪向上
-                if (compareStep > 0) {
-                    compareStep--;
-                    stepThrottleTime = Date.now();
-                    updateCompareCards();
-                } else {
-                    if (Date.now() - compareLastTransitionTime > 1000) {
-                        compareLastTransitionTime = Date.now();
-                        navigateToScreen('training-outro-screen-3');
+                } else if (direction < 0) {
+                    // 滾輪向上
+                    if (compareStep > 0) {
+                        compareStep--;
+                        stepThrottleTime = Date.now();
+                        updateCompareCards();
+                    } else {
+                        if (Date.now() - compareLastTransitionTime > 1000) {
+                            compareLastTransitionTime = Date.now();
+                            navigateToScreen('training-outro-screen-3');
+                        }
                     }
                 }
             }
